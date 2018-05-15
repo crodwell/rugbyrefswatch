@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_grey"
+    android:padding="@dimen/box_inset_layout_padding"
+    android:keepScreenOn="true"
+    tools:context=".MainActivity"
+    tools:deviceIds="wear">
+
+    <!--<android.support.constraint.ConstraintLayout-->
+        <!--android:id="@+id/frameLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:minHeight="300dp"-->
+        <!--android:minWidth="300dp"-->
+        <!--android:padding="@dimen/inner_frame_layout_padding"-->
+        <!--app:boxedEdges="all">-->
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/map_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="-5px">
+
+        <Button
+            android:id="@+id/home_yc"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/holo_orange_light"
+            android:onClick="newHomeYC"
+            android:textSize="10sp"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/match_clock" />
+
+        <Button
+            android:id="@+id/home_pen"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:background="@android:color/holo_red_dark"
+            android:gravity="top"
+            android:onClick="penCount"
+            android:text="@string/_0"
+            android:textAlignment="center"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/away_pen"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/away_pen"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:background="@android:color/holo_green_dark"
+            android:gravity="top"
+            android:onClick="penCount"
+            android:text="@string/_0"
+            android:textAlignment="center"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/home_pen" />
+
+        <Button
+            android:id="@+id/match_clock"
+            android:layout_width="198dp"
+            android:layout_height="33dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/background_light"
+            android:onClick="matchTimer"
+            android:text="@string/_halftime"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/away_yc"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/holo_orange_light"
+            android:onClick=""
+            android:textSize="10sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/match_clock" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+        <!--</android.support.constraint.ConstraintLayout>-->
+    <!--</FrameLayout>-->
+</android.support.wear.widget.BoxInsetLayout>
