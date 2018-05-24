@@ -9,12 +9,8 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.util.Log;
 import java.util.List;
-import android.widget.ArrayAdapter;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.wear.widget.CircularProgressLayout;
 
 import android.media.MediaPlayer;
 
@@ -69,19 +65,14 @@ public class MainActivity extends WearableActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // The user picked a player.
-                // The Intent's data Uri identifies which contact was selected.
                 String player = data.getExtras().get("player").toString();
                 String side = data.getExtras().get("side").toString();
-                Log.e("return-side", side);
-                if (side == "home"){
+                if (side.equals("home")){
                     homeYCs.add(new YellowCard(player));
                 } else {
                     awayYCs.add(new YellowCard(player));
                 }
-
-
-                Log.e("player: ", player);
-                // Do something with the contact here (bigger example below)
+                Log.e("YCPlayer: ", player);
             } else{
                 Log.e("YC: ", "Cancelled");
             }
@@ -122,17 +113,6 @@ public class MainActivity extends WearableActivity {
             matchTimerState = 1;
             matchPauseTimer.cancel();
 
-//            for (int x=0; x < homeYCsCurrentTimes.size(); x++) {
-//                final int y = x;
-//                homeYCs.set(x, new CountDownTimer(homeYCsCurrentTimes.get(x), 1000) { // adjust the milli seconds here
-//                    public void onTick(long millisUntilFinished) {
-//                        homeYCsCurrentTimes.set(y,millisUntilFinished);
-//                    }
-//
-//                    public void onFinish() {
-//                    }
-//                }.start());
-//            }
             for (YellowCard item:homeYCs) {
                 item.restartTimer();
             }
@@ -149,8 +129,8 @@ public class MainActivity extends WearableActivity {
 
     private void startMatchClock(long millisInFuture){
         final TextView txt = findViewById(R.id.match_clock);
-        final TextView homeYcTxt = findViewById(R.id.home_yc);
-        final TextView awayYcTxt = findViewById(R.id.away_yc);
+        final TextView homeYcBut = findViewById(R.id.home_yc);
+        final TextView awayYcBut = findViewById(R.id.away_yc);
 
         matchTimer = new CountDownTimer(millisInFuture, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -158,42 +138,33 @@ public class MainActivity extends WearableActivity {
                         TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
                 currentMatchTime = millisUntilFinished;
 
-                String homeYCText = new String();
-                for (int i = 0; i < homeYCs.size(); i++) {
-                    if (i < 3 || homeYCs.size() == 4) {
-                        homeYCText += homeYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
-                                TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
+                if (homeYCs.size() > 0) {
+                    String homeYCText = new String();
+                    for (int i = 0; i < homeYCs.size(); i++) {
+                        if (i < 3 || homeYCs.size() == 4) {
+                            homeYCText += homeYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
+                                    TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
+                        }
+                        if (homeYCs.size() > 4) {
+                            homeYCText += "+" + Integer.toString(homeYCs.size() - 3);
+                        }
                     }
-                    if (homeYCs.size() > 4){
-                        homeYCText += "+" + Integer.toString(homeYCs.size() - 3);
-                    }
+                    homeYcBut.setText(homeYCText);
                 }
-                homeYcTxt.setText(homeYCText);
 
-                String awayYCText = new String();
-                for (int i = 0; i < awayYCs.size(); i++) {
-                    if (i < 3 || awayYCs.size() == 4) {
-                        awayYCText += awayYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
+                if (awayYCs.size() > 0) {
+                    String awayYCText = new String();
+                    for (int i = 0; i < awayYCs.size(); i++) {
+                        if (i < 3 || awayYCs.size() == 4) {
+                            awayYCText += awayYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
                                 TimeUnit.MILLISECONDS.toSeconds(awayYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime))) + "\n";
+                        }
+                        if (awayYCs.size() > 4){
+                            awayYCText += "+" + Integer.toString(awayYCs.size() - 3);
+                        }
                     }
-                    if (awayYCs.size() > 4){
-                        awayYCText += "+" + Integer.toString(awayYCs.size() - 3);
-                    }
+                    awayYcBut.setText(awayYCText);
                 }
-                awayYcTxt.setText(awayYCText);
-
-                //get any yellow cards running and print their times
-//                String YCText = new String();
-//                for (int i = 0; i < homeYCsCurrentTimes.size(); i++) {
-//                    if (i < 3 || homeYCsCurrentTimes.size() == 4){
-//                        YCText += "" + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCsCurrentTimes.get(i)),
-//                                TimeUnit.MILLISECONDS.toSeconds(homeYCsCurrentTimes.get(i)) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCsCurrentTimes.get(i)))) + "\n";
-//                    }
-//                }
-//                if (homeYCsCurrentTimes.size() > 4){
-//                    YCText += "+" + Integer.toString(homeYCsCurrentTimes.size() - 3);
-//                }
-//                homeYcTxt.setText(YCText);
             }
 
             public void onFinish() {
