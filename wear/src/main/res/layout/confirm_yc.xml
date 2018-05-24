@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:keepScreenOn="true"
+    android:padding="15dp"
+    tools:context=".MainActivity"
+    tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:padding="5dp"
+        app:boxedEdges="all">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/confirmMsg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Yellow Card Timer started for\n8"
+                android:textAlignment="center"
+                android:textColor="@android:color/black" />
+
+
+            <android.support.wear.widget.CircularProgressLayout
+                android:id="@+id/circular_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                app:backgroundColor="#003387"
+                app:colorSchemeColors="#000000"
+                app:strokeWidth="4dp">
+
+                <ImageView
+                    android:id="@+id/image_view"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/cancel" />
+            </android.support.wear.widget.CircularProgressLayout>
+        </LinearLayout>
+
+
+    </FrameLayout>
+</android.support.wear.widget.BoxInsetLayout>

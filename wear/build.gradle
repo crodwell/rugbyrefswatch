@@ -35,5 +35,8 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:wear:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
     compileOnly 'com.google.android.wearable:wearable:2.3.0'
+
+
 }
