@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Rugby Refs Watch</string>
     <string name="_0">0</string>
-    <string name="_halftime">40:00</string>
+    <string name="_startTime">0:00</string>
 </resources>

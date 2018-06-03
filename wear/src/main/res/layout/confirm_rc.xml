@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@android:color/holo_red_dark"
     android:keepScreenOn="true"
     android:padding="5dp"
-    tools:context=".YellowCardActivity"
     tools:deviceIds="wear">
 
     <FrameLayout
@@ -19,16 +18,16 @@
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/confirmMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Yellow Card Starting For\n8"
+                android:text="Red Card For\n8"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
 
@@ -37,7 +36,7 @@
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:padding="4dp"
-                app:backgroundColor="#003387"
+                app:backgroundColor="#ffff4444"
                 app:colorSchemeColors="#000000"
                 app:strokeWidth="4dp">
 

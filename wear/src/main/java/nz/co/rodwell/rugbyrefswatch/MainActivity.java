@@ -7,10 +7,11 @@ import android.view.View;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import android.content.Intent;
-import android.util.Log;
-import java.util.List;
+import android.content.Context;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.graphics.Color;
+
 
 import android.media.MediaPlayer;
 
@@ -22,9 +23,15 @@ public class MainActivity extends WearableActivity {
     private CountDownTimer matchTimer;
     private CountDownTimer matchPauseTimer;
     private long currentMatchTime; //milliseconds left in match
+//    private long halfLength = 2400000; // 40 mins
+    private long halfLength = 10000;
+    private long overtimeLength = 600000;
+    private boolean halfTimeHooter;
 
-    ArrayList<YellowCard> homeYCs = new ArrayList<YellowCard>();
-    ArrayList<YellowCard> awayYCs = new ArrayList<YellowCard>();
+    ArrayList<YellowCard> homeYCs = new ArrayList<>();
+    ArrayList<YellowCard> awayYCs = new ArrayList<>();
+    private int activeHomeYCs = 0;
+    private int activeAwayYCs = 0;
 
     //Activity Request Code Constants
     static final int YELLOW_CARD = 100;
@@ -40,7 +47,7 @@ public class MainActivity extends WearableActivity {
     }
 
     public void penCount(View v) {
-        TextView txt=(TextView) findViewById(v.getId());
+        TextView txt = findViewById(v.getId());
         int currentCount = Integer.parseInt(txt.getText().toString());
         txt.setText(Integer.toString(currentCount + 1));
     }
@@ -49,12 +56,22 @@ public class MainActivity extends WearableActivity {
     public void newHomeYC(View v){
         Intent yellowCard = new Intent(getApplicationContext(), YellowCardActivity.class);
         yellowCard.putExtra("side", "home");
+        ArrayList<String> history = new ArrayList<>();
+        for (YellowCard item:homeYCs) {
+            history.add(item.player);
+        }
+        yellowCard.putExtra("history", history);
         startActivityForResult(yellowCard, YELLOW_CARD);
     }
 
     public void newAwayYC(View v){
         Intent yellowCard = new Intent(getApplicationContext(), YellowCardActivity.class);
         yellowCard.putExtra("side", "away");
+        ArrayList<String> history = new ArrayList<>();
+        for (YellowCard item:awayYCs) {
+            history.add(item.player);
+        }
+        yellowCard.putExtra("history", history);
         startActivityForResult(yellowCard, YELLOW_CARD);
     }
 
@@ -68,13 +85,12 @@ public class MainActivity extends WearableActivity {
                 String player = data.getExtras().get("player").toString();
                 String side = data.getExtras().get("side").toString();
                 if (side.equals("home")){
-                    homeYCs.add(new YellowCard(player));
+                    homeYCs.add(new YellowCard(this, player));
+                    activeHomeYCs++;
                 } else {
-                    awayYCs.add(new YellowCard(player));
+                    awayYCs.add(new YellowCard(this, player));
+                    activeAwayYCs++;
                 }
-                Log.e("YCPlayer: ", player);
-            } else{
-                Log.e("YC: ", "Cancelled");
             }
         }
     }
@@ -114,91 +130,185 @@ public class MainActivity extends WearableActivity {
             matchPauseTimer.cancel();
 
             for (YellowCard item:homeYCs) {
-                item.restartTimer();
+                if (!item.expired) {
+                    item.restartTimer();
+                }
             }
             for (YellowCard item:awayYCs) {
-                item.restartTimer();
+                if (!item.expired) {
+                    item.restartTimer();
+                }
             }
 
 
         } else { // Start Timer
-            startMatchClock(2400000);
+            startMatchClock(0);
             matchTimerState = 1;
         }
     }
 
+    public void ackYcCompleted(View v){
+        for (YellowCard item:homeYCs) {
+            if (item.expired) {
+                activeHomeYCs--;
+                item.acknowledge();
+            }
+        }
+
+        for (YellowCard item:awayYCs) {
+            if (item.expired) {
+                activeAwayYCs--;
+                item.acknowledge();
+            }
+        }
+
+
+
+        v.setVisibility(View.GONE);
+    }
+
+
+
     private void startMatchClock(long millisInFuture){
         final TextView txt = findViewById(R.id.match_clock);
-        final TextView homeYcBut = findViewById(R.id.home_yc);
-        final TextView awayYcBut = findViewById(R.id.away_yc);
 
-        matchTimer = new CountDownTimer(millisInFuture, 1000) {
+        final long bigLong = 20000000; // stupidly high limit we will never reach. Let's us run Countdown as Countup. (I didn't like Chronometer package)
+        final long startTime = bigLong - millisInFuture;
+
+        matchTimer = new CountDownTimer(startTime, 1000) {
             public void onTick(long millisUntilFinished) {
-                txt.setText(""+String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished),
-                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
-                currentMatchTime = millisUntilFinished;
 
-                if (homeYCs.size() > 0) {
-                    String homeYCText = new String();
-                    for (int i = 0; i < homeYCs.size(); i++) {
-                        if (i < 3 || homeYCs.size() == 4) {
-                            homeYCText += homeYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
-                                    TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
-                        }
-                        if (homeYCs.size() > 4) {
-                            homeYCText += "+" + Integer.toString(homeYCs.size() - 3);
-                        }
-                    }
-                    homeYcBut.setText(homeYCText);
+                currentMatchTime = bigLong - millisUntilFinished;
+                txt.setText(""+String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
+                        TimeUnit.MILLISECONDS.toSeconds(currentMatchTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentMatchTime))));
+                if (currentMatchTime > halfLength && !halfTimeHooter) {
+                    txt.setBackgroundColor(Color.RED);
+                    txt.setTextColor(Color.WHITE);
+                    MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.hooter);
+                    mediaPlayer.setVolume(1.0F, 1.0F);
+                    mediaPlayer.start();
+                    halfTimeHooter = true;
                 }
-
-                if (awayYCs.size() > 0) {
-                    String awayYCText = new String();
-                    for (int i = 0; i < awayYCs.size(); i++) {
-                        if (i < 3 || awayYCs.size() == 4) {
-                            awayYCText += awayYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
-                                TimeUnit.MILLISECONDS.toSeconds(awayYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime))) + "\n";
-                        }
-                        if (awayYCs.size() > 4){
-                            awayYCText += "+" + Integer.toString(awayYCs.size() - 3);
-                        }
-                    }
-                    awayYcBut.setText(awayYCText);
-                }
+                printYcStatus();
             }
 
             public void onFinish() {
-                txt.setText("Times up!");
             }
         }.start();
+    }
+
+    private void printYcStatus(){
+        Integer homeYcTextview = 0;
+        Integer awayYcTextview = 0;
+
+        if (homeYCs.size() > 0) {
+            String homeYCText;
+            for (int i = 0; i < homeYCs.size(); i++) {
+                int resourceID = getResources().getIdentifier("home_yc_" + Integer.toString(homeYcTextview), "id", getPackageName());
+                TextView homeYc = findViewById(resourceID);
+                if (homeYCs.get(i).acknowledged){
+                    ((TextView)findViewById(R.id.home_yc_0)).setText("");
+                    ((TextView)findViewById(R.id.home_yc_1)).setText("");
+                    continue;
+                }
+
+                if( homeYCs.get(i).expired){
+                    homeYc.setTextColor(Color.RED);
+                    (findViewById(R.id.ackYc)).setVisibility(View.VISIBLE);
+                } else {
+                    homeYc.setTextColor(Color.BLACK);
+                }
+                if (homeYcTextview == 1 && activeHomeYCs > 2) {
+                    homeYCText = "+" + Integer.toString(activeHomeYCs - 1);
+                    homeYc.setTextColor(Color.BLACK);
+                    homeYc.setText(homeYCText);
+                }
+
+                if (homeYcTextview < 1 || activeHomeYCs == 2) {
+                    homeYCText = homeYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
+                            TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
+                    homeYc.setText(homeYCText);
+                    homeYcTextview++;
+                }
+
+            }
+        }
+
+        if (awayYCs.size() > 0) {
+            String awayYCText;
+            for (int i = 0; i < awayYCs.size(); i++) {
+                int resourceID = getResources().getIdentifier("away_yc_" + Integer.toString(awayYcTextview), "id", getPackageName());
+                TextView awayYc = findViewById(resourceID);
+
+                if (awayYCs.get(i).acknowledged){
+                    ((TextView)findViewById(R.id.away_yc_0)).setText("");
+                    ((TextView)findViewById(R.id.away_yc_1)).setText("");
+                    continue;
+                }
+
+                if( awayYCs.get(i).expired){
+                    awayYc.setTextColor(Color.RED);
+                    (findViewById(R.id.ackYc)).setVisibility(View.VISIBLE);
+                } else {
+                    awayYc.setTextColor(Color.BLACK);
+                }
+
+                if (awayYcTextview == 1 && activeAwayYCs > 2) { // if we've printed one already
+                    awayYCText = "+" + Integer.toString(activeAwayYCs - 1);
+                    awayYc.setTextColor(Color.BLACK);
+                    awayYc.setText(awayYCText);
+                }
+
+                if (awayYcTextview < 1 || activeAwayYCs == 2) { //always print item if first in list or 2 total
+                    awayYCText = awayYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
+                            TimeUnit.MILLISECONDS.toSeconds(awayYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime))) + "\n";
+                    awayYc.setText(awayYCText);
+                    awayYcTextview++;
+                }
+
+            }
+        }
     }
 
 }
 
 class YellowCard {
-    public String side;
+    private Context context;
     public String player;
     public Long currentTime;
+    public boolean acknowledged;
+    public boolean expired;
     private CountDownTimer ycTimer;
+    private MediaPlayer mediaPlayer;
 
-    public YellowCard (String player){
+    public YellowCard (Context context, String player){
+        this.context = context;
         this.player = player;
         createTimer();
     }
 
     private void createTimer() {
-        ycTimer = new CountDownTimer(600000, 1000) { // adjust the milli seconds here
+        ycTimer = new CountDownTimer(30000, 1000) { // adjust the milli seconds here
             public void onTick(long millisUntilFinished) {
                 currentTime = millisUntilFinished;
             }
 
             public void onFinish() {
+                mediaPlayer = MediaPlayer.create(context.getApplicationContext(), R.raw.alarm);
+                mediaPlayer.setVolume(1.0F, 1.0F);
+                mediaPlayer.start();
+                expired = true;
             }
         }.start();
     }
 
     public void pauseTimer() {
         ycTimer.cancel();
+    }
+
+    public void acknowledge() {
+        this.acknowledged = true;
+        this.mediaPlayer.stop();
     }
 
     public void restartTimer() {
@@ -208,6 +318,10 @@ class YellowCard {
             }
 
             public void onFinish() {
+                mediaPlayer = MediaPlayer.create(context.getApplicationContext(), R.raw.alarm);
+                mediaPlayer.setVolume(1.0F, 1.0F);
+                mediaPlayer.start();
+                expired = true;
             }
         }.start();
     }

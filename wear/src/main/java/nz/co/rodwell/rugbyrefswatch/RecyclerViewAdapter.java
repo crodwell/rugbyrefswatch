@@ -5,7 +5,6 @@ import android.widget.TextView;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
-import android.support.wear.widget.CircularProgressLayout;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SimpleViewHolder> {
     private String[] dataSource;
@@ -39,7 +38,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(final SimpleViewHolder holder, final int position) {
-        holder.textView.setTextSize(20);
+        holder.textView.setTextSize(30);
         holder.textView.setGravity(Gravity.CENTER);
         holder.textView.setText(dataSource[position]);
         holder.textView.setOnClickListener(new View.OnClickListener() {

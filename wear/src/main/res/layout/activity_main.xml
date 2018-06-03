@@ -10,46 +10,139 @@
     tools:context=".MainActivity"
     tools:deviceIds="wear">
 
-    <!--<android.support.constraint.ConstraintLayout-->
-        <!--android:id="@+id/frameLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:minHeight="300dp"-->
-        <!--android:minWidth="300dp"-->
-        <!--android:padding="@dimen/inner_frame_layout_padding"-->
-        <!--app:boxedEdges="all">-->
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/map_container"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="-5px">
 
         <Button
-            android:id="@+id/home_yc"
-            android:layout_width="50dp"
+            android:id="@+id/match_clock"
+            android:layout_width="198dp"
             android:layout_height="50dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/background_light"
+            android:onClick="matchTimer"
+            android:text="@string/_startTime"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--<Chronometer-->
+            <!--android:id="@+id/match_clock"-->
+            <!--android:layout_width="198dp"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:layout_marginTop="4dp"-->
+            <!--android:background="@android:color/background_light"-->
+            <!--android:onClick="matchTimer"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="@android:color/black"-->
+            <!--android:textSize="24sp"-->
+            <!--android:visibility="visible"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+
+        <FrameLayout
+            android:id="@+id/home_yc"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="50dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
             android:background="@android:color/holo_orange_light"
             android:onClick="newHomeYC"
-            android:textSize="10sp"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/match_clock">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="0dp"
+                android:layout_margin="1dp">
+                <TextView
+                    android:id="@+id/home_yc_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/home_yc_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/ackYc"
+            android:layout_width="57dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="8dp"
+            android:onClick="ackYcCompleted"
+            android:text="OK"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/match_clock" />
+
+        <FrameLayout
+            android:id="@+id/away_yc"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="50dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/holo_orange_light"
+            android:onClick="newAwayYC"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/match_clock">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dp"
+                android:orientation="vertical"
+                android:padding="0dp">
+
+                <TextView
+                    android:id="@+id/away_yc_0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:textSize="14sp"
+                    android:gravity="right"
+                    />
+
+                <TextView
+                    android:id="@+id/away_yc_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:textSize="14sp"
+                    android:gravity="right"
+                    />
+            </LinearLayout>
+        </FrameLayout>
 
         <Button
             android:id="@+id/home_pen"
             android:layout_width="0dp"
             android:layout_height="90dp"
-            android:background="@android:color/holo_red_dark"
+            android:background="#1f2287"
             android:gravity="top"
             android:onClick="penCount"
+            android:paddingLeft="20dp"
+            android:paddingTop="15dp"
             android:text="@string/_0"
             android:textAlignment="center"
+            android:textSize="30sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/away_pen"
@@ -59,47 +152,26 @@
             android:id="@+id/away_pen"
             android:layout_width="0dp"
             android:layout_height="90dp"
-            android:background="@android:color/holo_green_dark"
+            android:background="@android:color/black"
             android:gravity="top"
             android:onClick="penCount"
+            android:paddingRight="20dp"
+            android:paddingTop="15dp"
             android:text="@string/_0"
             android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/home_pen" />
 
-        <Button
-            android:id="@+id/match_clock"
-            android:layout_width="198dp"
-            android:layout_height="33dp"
-            android:layout_marginTop="4dp"
-            android:background="@android:color/background_light"
-            android:onClick="matchTimer"
-            android:text="@string/_halftime"
-            android:textColor="@android:color/black"
-            android:textSize="24sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/away_yc"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/holo_orange_light"
-            android:onClick="newAwayYC"
-            android:textSize="10sp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/match_clock" />
+
+
+
 
 
     </android.support.constraint.ConstraintLayout>
 
-        <!--</android.support.constraint.ConstraintLayout>-->
-    <!--</FrameLayout>-->
 </android.support.wear.widget.BoxInsetLayout>
