@@ -36,6 +36,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".YellowCardActivity"></activity>
+        <activity android:name=".PeriodSelectActivity"></activity>
 
     </application>
 

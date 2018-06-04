@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_orange_light"
+    android:background="#cecece"
     android:keepScreenOn="true"
     android:padding="5dp"
-    tools:context=".YellowCardActivity"
+    tools:context=".PeriodSelectActivity"
     tools:deviceIds="wear">
 
     <FrameLayout
@@ -26,7 +26,7 @@
                 android:id="@+id/confirmMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Yellow Card Starting For\n8"
+                android:text="Confirm Action"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
@@ -37,7 +37,7 @@
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:padding="4dp"
-                app:backgroundColor="#ff6600"
+                app:backgroundColor="#8f8f8f"
                 app:colorSchemeColors="#000000"
                 app:strokeWidth="4dp">
 

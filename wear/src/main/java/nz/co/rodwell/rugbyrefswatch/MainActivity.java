@@ -3,6 +3,7 @@ package nz.co.rodwell.rugbyrefswatch;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.widget.TextView;
+import android.widget.Button;
 import android.view.View;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import android.content.Context;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.graphics.Color;
+import android.view.View.OnLongClickListener;
+import android.util.Log;
 
 
 import android.media.MediaPlayer;
@@ -23,9 +26,11 @@ public class MainActivity extends WearableActivity {
     private CountDownTimer matchTimer;
     private CountDownTimer matchPauseTimer;
     private long currentMatchTime; //milliseconds left in match
-//    private long halfLength = 2400000; // 40 mins
-    private long halfLength = 10000;
-    private long overtimeLength = 600000;
+
+    private int currentPeriod = 0;
+    private String[] periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
+    private long[] periodLengths = new long[]{2400000, 2400000, 600000, 600000};
+
     private boolean halfTimeHooter;
 
     ArrayList<YellowCard> homeYCs = new ArrayList<>();
@@ -35,15 +40,27 @@ public class MainActivity extends WearableActivity {
 
     //Activity Request Code Constants
     static final int YELLOW_CARD = 100;
+    static final int PERIOD_SELECT = 200;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         // Enables Always-on
         setAmbientEnabled();
+        setContentView(R.layout.activity_main);
+
+        Button matchClock = findViewById(R.id.match_clock);
+        matchClock.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent periodSelect = new Intent(getApplicationContext(), PeriodSelectActivity.class);
+                periodSelect.putExtra("finalPeriod", (currentPeriod == periodLengths.length -1));
+                startActivityForResult(periodSelect, PERIOD_SELECT);
+                return true;
+            }
+        });
+
     }
 
     public void penCount(View v) {
@@ -54,6 +71,9 @@ public class MainActivity extends WearableActivity {
 
 
     public void newHomeYC(View v){
+        if (matchTimerState == 0){
+            return; // don't allow YC if match hasn't started
+        }
         Intent yellowCard = new Intent(getApplicationContext(), YellowCardActivity.class);
         yellowCard.putExtra("side", "home");
         ArrayList<String> history = new ArrayList<>();
@@ -65,6 +85,9 @@ public class MainActivity extends WearableActivity {
     }
 
     public void newAwayYC(View v){
+        if (matchTimerState == 0){
+            return; // don't allow YC if match hasn't started
+        }
         Intent yellowCard = new Intent(getApplicationContext(), YellowCardActivity.class);
         yellowCard.putExtra("side", "away");
         ArrayList<String> history = new ArrayList<>();
@@ -93,6 +116,37 @@ public class MainActivity extends WearableActivity {
                 }
             }
         }
+
+        if (requestCode == PERIOD_SELECT){
+            if (resultCode == RESULT_OK) {
+                String action = data.getExtras().get("action").toString();
+                if (action.equals("quit")){
+                    finishAndRemoveTask();
+                }
+                if (action.equals("period")){
+                    currentPeriod++;
+                    final TextView infoBar = findViewById(R.id.info_bar);
+                    infoBar.setText(periodLabels[currentPeriod] + "(" + Long.toString(periodLengths[currentPeriod] / 60000) + " mins)");
+
+                    for (YellowCard item:homeYCs) {
+                        item.pauseTimer();
+                    }
+                    for (YellowCard item:awayYCs) {
+                        item.pauseTimer();
+                    }
+                    TextView matchClock = findViewById(R.id.match_clock);
+                    matchClock.setText("0:00");
+                    matchTimer.cancel();
+                    matchTimerState = 0;
+                    currentMatchTime = 0L;
+
+                }
+                if (action.equals("restart")){
+                    // TODO: clear all yellow cards and set period and match clock to 0
+                }
+            }
+        }
+
     }
 
     public void matchTimer(View v) {
@@ -144,6 +198,17 @@ public class MainActivity extends WearableActivity {
         } else { // Start Timer
             startMatchClock(0);
             matchTimerState = 1;
+            // restart YC's as this may be start of 2nd half
+            for (YellowCard item:homeYCs) {
+                if (!item.expired) {
+                    item.restartTimer();
+                }
+            }
+            for (YellowCard item:awayYCs) {
+                if (!item.expired) {
+                    item.restartTimer();
+                }
+            }
         }
     }
 
@@ -181,7 +246,7 @@ public class MainActivity extends WearableActivity {
                 currentMatchTime = bigLong - millisUntilFinished;
                 txt.setText(""+String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
                         TimeUnit.MILLISECONDS.toSeconds(currentMatchTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentMatchTime))));
-                if (currentMatchTime > halfLength && !halfTimeHooter) {
+                if (currentMatchTime > periodLengths[currentPeriod] && !halfTimeHooter) {
                     txt.setBackgroundColor(Color.RED);
                     txt.setTextColor(Color.WHITE);
                     MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.hooter);
