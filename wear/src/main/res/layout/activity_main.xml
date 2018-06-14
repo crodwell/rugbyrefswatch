@@ -126,40 +126,45 @@
             </LinearLayout>
         </FrameLayout>
 
-        <Button
-            android:id="@+id/home_pen"
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            android:background="#1f2287"
-            android:gravity="top"
-            android:onClick="penCount"
-            android:paddingLeft="20dp"
-            android:paddingTop="15dp"
-            android:text="@string/_0"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/away_pen"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/away_pen"
-            android:layout_width="0dp"
-            android:layout_height="90dp"
-            android:background="@android:color/black"
-            android:gravity="top"
-            android:onClick="penCount"
-            android:paddingRight="20dp"
-            android:paddingTop="15dp"
-            android:text="@string/_0"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="30sp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/home_pen" />
+            app:layout_constraintTop_toBottomOf="@+id/home_yc">
+
+            <Button
+                android:id="@+id/home_pen"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:background="#1f2287"
+                android:gravity="top"
+                android:onClick="penCount"
+                android:paddingLeft="20dp"
+                android:paddingTop="15dp"
+                android:text="@string/_0"
+                android:textAlignment="center"
+                android:textSize="30sp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/away_pen"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                android:background="@android:color/black"
+                android:gravity="top"
+                android:onClick="penCount"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp"
+                android:text="@string/_0"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="30sp"
+                android:visibility="visible" />
+        </LinearLayout>
 
 
 

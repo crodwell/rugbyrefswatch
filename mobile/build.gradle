@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "nz.co.rodwell.rugbyrefswatch"
+        applicationId "com.refrugby.watch"
         minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
@@ -24,8 +24,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:design:27.1.1'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     wearApp project(':wear')
-    implementation 'com.google.android.gms:play-services-wearable:+'
+    implementation 'com.google.android.gms:play-services-wearable:15.0.1'
 }
