@@ -44,10 +44,12 @@
             <TextView
                 android:id="@+id/intro_text"
                 android:layout_width="fill_parent"
-                android:layout_height="450dp"
+                android:layout_height="330dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginStart="16dp"
                 android:autoLink="web"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbars="vertical"
                 android:text="@string/intro_text"
                 android:textColor="@android:color/black"
                 app:layout_constraintBottom_toBottomOf="parent"

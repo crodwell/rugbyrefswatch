@@ -3,23 +3,26 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         signing_key {
-            storeFile file('C:/Users/Chris/AndroidStudioProjects/RugbyRefsWatch/signing_key.jks')
+            storeFile file('../../../Documents/ref_watch.jks') // not checked into git
             keyAlias 'key0'
+            storePassword "refwatch"
+            keyPassword "refwatch"
         }
     }
+
     compileSdkVersion 27
     defaultConfig {
         applicationId 'com.refrugby.watch'
         minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
         signingConfig signingConfigs.signing_key
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     publishNonDefault true
@@ -36,7 +39,6 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:wear:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    //    implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.apache.commons:commons-lang3:3.6'
     compileOnly 'com.google.android.wearable:wearable:2.3.0'
 }
