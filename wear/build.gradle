@@ -4,6 +4,7 @@ android {
     signingConfigs {
         signing_key {
             storeFile file('C:/Users/Chris/AndroidStudioProjects/RugbyRefsWatch/signing_key.jks')
+            keyAlias 'key0'
         }
     }
     compileSdkVersion 27
@@ -12,7 +13,7 @@ android {
         minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         signingConfig signingConfigs.signing_key
     }
     buildTypes {
@@ -35,9 +36,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:wear:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-//    implementation 'com.squareup.picasso:picasso:2.5.2'
+    //    implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.apache.commons:commons-lang3:3.6'
     compileOnly 'com.google.android.wearable:wearable:2.3.0'
-
-
 }

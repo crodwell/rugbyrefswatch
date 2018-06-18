@@ -2,7 +2,6 @@ package com.refrugby.watch;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.Task;
 
 import com.google.android.gms.wearable.Wearable;
+import com.google.android.gms.wearable.CapabilityInfo;
 
 
 
@@ -54,12 +54,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void start(View v){
+    public void showSettings(View v){
         setContentView(R.layout.watch_settings);
         Spinner awayColour = findViewById(R.id.away_colour);
         awayColour.setSelection(1);
-        TextView debug = findViewById(R.id.debug_text);
-
     }
 
 
@@ -73,15 +71,15 @@ public class MainActivity extends AppCompatActivity {
         String serialisedSettings = "half_length:" + halfLength.getText() + "|extra_time_length:" + extraTimeLength.getText() + "|yc_length:" + ycLength.getText() +
                 "|home_colour:" + homeColour.getSelectedItem().toString() + "|away_colour:" + awayColour.getSelectedItem().toString() + "|";
 
-        new NewThread("/rrw_settings", serialisedSettings).start();
+        new MessageThread("/rrw_settings", serialisedSettings).start();
     }
 
-    class NewThread extends Thread {
+    class MessageThread extends Thread {
         String path;
         String message;
 
         //Constructor for sending information to the Data Layer//
-        NewThread(String p, String m) {
+        MessageThread(String p, String m) {
             path = p;
             message = m;
         }
@@ -89,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
 
             //Retrieve the connected devices, known as nodes//
-//            TextView debug = findViewById(R.id.debug_text);
-
             Task<List<Node>> wearableList =
                     Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
             try {
@@ -101,10 +97,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             } catch (ExecutionException exception) {
-//                debug.setText(exception.toString());
+                // catch
             } catch (InterruptedException exception) {
-//                debug.setText(exception.toString());
+                // catch
             }
         }
     }
+
+
+
 }
