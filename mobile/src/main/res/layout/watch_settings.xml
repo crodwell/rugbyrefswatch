@@ -54,7 +54,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="180dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:labelFor="@id/half_length"
                     android:text="@string/half_length"
@@ -76,7 +76,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="180dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:labelFor="@id/extra_time_length"
                     android:text="@string/extra_time_length"
@@ -98,7 +98,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="180dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:labelFor="@id/yc_length"
                     android:text="@string/yc_length"
@@ -120,7 +120,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="180dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:labelFor="@id/home_colour"
                     android:text="@string/home_colour"
@@ -142,7 +142,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="180dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:labelFor="@id/away_colour"
                     android:text="@string/away_colour"

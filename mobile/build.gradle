@@ -12,10 +12,10 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId 'com.refrugby.watch'
-        minSdkVersion 25
+        minSdkVersion 21
         targetSdkVersion 27
-        versionCode 10101
-        versionName "1.0.1"
+        versionCode 10102
+        versionName "1.0.2"
         signingConfig signingConfigs.signing_key
     }
     buildTypes {
