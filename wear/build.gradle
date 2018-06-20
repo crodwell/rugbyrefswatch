@@ -9,14 +9,13 @@ android {
             keyPassword "refwatch"
         }
     }
-
     compileSdkVersion 27
     defaultConfig {
         applicationId 'com.refrugby.watch'
         minSdkVersion 25
         targetSdkVersion 27
-        versionCode 103
-        versionName "1.0.3"
+        versionCode 104
+        versionName "1.0.4"
         signingConfig signingConfigs.signing_key
     }
     buildTypes {

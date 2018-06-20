@@ -71,7 +71,7 @@ public class MainActivity extends WearableActivity {
         teamTextColours = new HashMap<>();
         teamTextColours.put("Blue", "#FFFFFF");
         teamTextColours.put("White", "#000000");
-        teamTextColours.put("Red", "#000000");
+        teamTextColours.put("Red", "#FFFFFF");
         teamTextColours.put("Black", "#FFFFFF");
         teamTextColours.put("Gold", "#000000");
         teamTextColours.put("Green", "#FFFFFF");
@@ -218,7 +218,14 @@ public class MainActivity extends WearableActivity {
                     }
                     TextView matchClock = findViewById(R.id.match_clock);
                     matchClock.setText("0:00");
-                    matchTimer.cancel();
+                    matchClock.setBackgroundColor(Color.WHITE);
+                    matchClock.setTextColor(Color.BLACK);
+                    if (matchTimerState > 0) {
+                        matchTimer.cancel();
+                    }
+                    if (matchTimerState == 2) {
+                        matchPauseTimer.cancel();
+                    }
                     matchTimerState = 0;
                     currentMatchTime = 0L;
 
@@ -298,6 +305,9 @@ public class MainActivity extends WearableActivity {
         if (matchTimerState > 0) {
             matchTimer.cancel();
         }
+        if (matchTimerState == 2) {
+            matchPauseTimer.cancel();
+        }
 
         for (YellowCard item:homeYCs) {
             item.pauseTimer();
@@ -310,6 +320,8 @@ public class MainActivity extends WearableActivity {
         printYcStatus();
         TextView matchClock = findViewById(R.id.match_clock);
         matchClock.setText("0:00");
+        matchClock.setBackgroundColor(Color.WHITE);
+        matchClock.setTextColor(Color.BLACK);
         matchTimerState = 0;
         currentPeriod = 0;
         currentMatchTime = 0L;
