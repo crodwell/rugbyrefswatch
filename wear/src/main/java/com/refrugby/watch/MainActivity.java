@@ -226,6 +226,7 @@ public class MainActivity extends WearableActivity {
                     if (matchTimerState == 2) {
                         matchPauseTimer.cancel();
                     }
+                    halfTimeHooter = false;
                     matchTimerState = 0;
                     currentMatchTime = 0L;
 
@@ -322,6 +323,7 @@ public class MainActivity extends WearableActivity {
         matchClock.setText("0:00");
         matchClock.setBackgroundColor(Color.WHITE);
         matchClock.setTextColor(Color.BLACK);
+        halfTimeHooter = false;
         matchTimerState = 0;
         currentPeriod = 0;
         currentMatchTime = 0L;
