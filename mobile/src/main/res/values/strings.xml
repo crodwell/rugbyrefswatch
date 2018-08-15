@@ -1,25 +1,23 @@
 <resources>
     <string name="app_name">Rugby Referee Watch</string>
     <string name="action_settings">Settings</string>
-    <string name="intro_text"><b>DISCLAIMER:</b>\n
-        This software is provided free of charge and can be an invaluable tool track match time, yellow cards and penalties.\n
-        \nAny software has the potential to crash; never rely on this app to keep score and ALWAYS wear a backup watch to save embarrassment!\n
-        \nIf this app is helpful, please leave positive feedback using the button below.\n
-        \n
-        <b>INSTRUCTIONS:</b>\n
-        * Install this app on your smart watch, connect to this phone using the Wear OS app and click start below.
-        * Select period/yellow card lengths and team colours and send to the smart watch before the match.\n\n
-        * Click match time to start/stop all timers.\n\n
-        * Long pressing the match time will give you an option to start the next period, restart match or exit the app.\n\n
-        * Long pressing the penalty counters will reverse the count.\n\n
-        \n
-        <a href="http://www.refrugby.com">www.refrugby.com</a>\n
-    </string>
+    <string name="intro_text"><b>IMPORTANT:</b>\n
+A compatible Android smart watch with Wear OS 2.0 or greater connected to this phone via bluetooth is required to use this app.\n\n
+<b>DISCLAIMER:</b>\n
+This software is provided free of charge and can be an invaluable tool track match time, yellow cards and penalties.\n\n
+Any software has the potential to crash; never rely on this app to keep score and ALWAYS wear a backup watch to save embarrassment!\n\n
+If this app is helpful, please leave positive feedback using the button below.\n\n
+<b>INSTRUCTIONS:</b>\n
+* Install this app on your smart watch, connect to this phone using the Wear OS app and click start below.\n\n
+* Select period/yellow card lengths and team colours and send to the smart watch before the match.\n\n
+* Click match time to start/stop all timers.\n\n
+* Long pressing the penalty counters will reverse the count.\n\n\n
+<a href="http://www.refrugby.com">www.refrugby.com</a></string>
     <string name="half_length">Half Length</string>
     <string name="extra_time_length">Extra Time Length</string>
     <string name="yc_length">Yellow Card Length</string>
     <string name="rate">Rate App</string>
-    <string name="save">Save</string>
+    <string name="save">Send to Watch</string>
     <string name="start">Start</string>
 
     <string name="home_colour">Home Colour</string>

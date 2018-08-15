@@ -2,4 +2,18 @@
     <string name="app_name">Rugby Referee Watch</string>
     <string name="_0">0</string>
     <string name="_startTime">0:00</string>
+    <string name="_home">Home</string>
+    <string name="_away">Away</string>
+    <string name="_nextPeriod">Next Period</string>
+    <string name="_startingNextPeriod">Starting Next Period</string>
+    <string name="_restartMatch">Restart Match</string>
+    <string name="_restartingMatch">Restarting Match</string>
+    <string name="_quitApp">Quit App</string>
+    <string name="_quittingApp">Quitting App</string>
+    <string name="_cancel">Cancel</string>
+    <string name="_matchSummary">Match Summary</string>
+    <string name="_firstHalf">1st Half</string>
+    <string name="_secondHalf">2nd Half</string>
+    <string name="_extraTime1">Extra Time 1</string>
+    <string name="_extraTime2">Extra Time 2</string>
 </resources>

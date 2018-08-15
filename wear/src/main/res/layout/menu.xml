@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#cecece"
+    android:padding="@dimen/box_inset_layout_padding"
+    android:keepScreenOn="true"
+    tools:context=".MenuActivity"
+    tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        app:boxedEdges="all">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/next_period"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="nextPeriod"
+                android:text="@string/_nextPeriod" />
+
+            <Button
+                android:id="@+id/restart_match"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="restartMatch"
+                android:text="@string/_restartMatch" />
+
+            <Button
+                android:id="@+id/quit_app"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:onClick="quitApp"
+                android:text="@string/_quitApp" />
+
+            <Button
+                android:id="@+id/cancel_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="cancelMenu"
+                android:text="@string/_cancel" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</android.support.wear.widget.BoxInsetLayout>

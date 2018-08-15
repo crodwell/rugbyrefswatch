@@ -24,8 +24,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View view = new TextView(parent.getContext());
-        SimpleViewHolder viewHolder = new SimpleViewHolder(view);
-        return viewHolder;
+        return new SimpleViewHolder(view);
     }
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder{

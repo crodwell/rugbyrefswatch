@@ -46,14 +46,14 @@
 
         <FrameLayout
             android:id="@+id/home_yc"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_width="45dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="32dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="4dp"
             android:background="@android:color/holo_orange_light"
-            android:onClick="newHomeYC"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="homeYC"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_bar">
@@ -62,32 +62,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/home_yc_0"
-                    android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="16dp"
+                    android:gravity="center"
                     android:textSize="14sp" />
+
                 <TextView
                     android:id="@+id/home_yc_1"
-                    android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="16dp"
+                    android:gravity="center"
                     android:textSize="14sp" />
             </LinearLayout>
         </FrameLayout>
 
         <Button
-            android:id="@+id/ackYc"
-            android:layout_width="55dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="0dp"
-            android:onClick="ackYcCompleted"
-            android:text="OK"
-            android:visibility="gone"
+            android:id="@+id/menu_button"
+            android:layout_width="40dp"
+            android:layout_height="36dp"
+            android:background="@drawable/menu"
+            android:layout_marginTop="4dp"
+            android:onClick="menu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_bar" />
+
 
         <FrameLayout
             android:id="@+id/away_yc"
@@ -95,10 +97,10 @@
             android:focusable="true"
             android:layout_width="45dp"
             android:layout_height="36dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginTop="4dp"
             android:background="@android:color/holo_orange_light"
-            android:onClick="newAwayYC"
+            android:onClick="awayYC"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/info_bar">
@@ -132,7 +134,8 @@
             android:orientation="horizontal"
             android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/home_yc">
+            app:layout_constraintTop_toBottomOf="@+id/home_yc"
+            >
 
             <Button
                 android:id="@+id/home_pen"
@@ -141,13 +144,14 @@
                 android:layout_weight="1"
                 android:background="#1f2287"
                 android:gravity="top"
-                android:onClick="penCount"
+                android:onClick="homePen"
                 android:paddingLeft="20dp"
                 android:paddingTop="15dp"
                 android:text="@string/_0"
                 android:textAlignment="center"
                 android:textSize="30sp"
-                android:visibility="visible" />
+                android:visibility="visible"
+                style="?android:attr/borderlessButtonStyle" />
 
             <Button
                 android:id="@+id/away_pen"
@@ -156,14 +160,15 @@
                 android:layout_weight="1"
                 android:background="@android:color/black"
                 android:gravity="top"
-                android:onClick="penCount"
+                android:onClick="awayPen"
                 android:paddingRight="20dp"
                 android:paddingTop="15dp"
                 android:text="@string/_0"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="30sp"
-                android:visibility="visible" />
+                android:visibility="visible"
+                style="?android:attr/borderlessButtonStyle"/>
         </LinearLayout>
 
 

@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".YellowCardActivity" />
-        <activity android:name=".PeriodSelectActivity" />
+        <activity android:name=".MainMenuActivity" />
 
         <service
             android:name=".MessageService"
