@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -18,34 +19,37 @@ import java.util.ArrayList;
 
 public class MainMenuActivity extends WearableActivity {
 
+    private Integer currentPeriod;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
         Intent i = getIntent();
+        currentPeriod = i.getIntExtra("currentPeriod", 0);
         WearableRecyclerView recyclerView = findViewById(R.id.main_menu_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setEdgeItemsCenteringEnabled(true);
         recyclerView.setLayoutManager(new WearableLinearLayoutManager(this));
 
         ArrayList<MenuItem> menuItems = new ArrayList<>();
-        menuItems.add(new MenuItem(R.drawable.back_icon, "Back"));
+        menuItems.add(new MenuItem("back", R.drawable.back_icon, "Back"));
         if (!i.getBooleanExtra("finalPeriod", false)){
-            menuItems.add(new MenuItem(R.drawable.next_period_icon,"Next Period"));
+            menuItems.add(new MenuItem("nextPeriod", R.drawable.next_period_icon,"Next Period"));
         }
-        menuItems.add(new MenuItem(R.drawable.summary_icon,"Match Summary"));
-        menuItems.add(new MenuItem(R.drawable.restart_match_icon,"Restart Match"));
-        menuItems.add(new MenuItem(R.drawable.quit_app_icon, "Quit App"));
+        menuItems.add(new MenuItem("matchSummary", R.drawable.summary_icon,"Match Summary"));
+        menuItems.add(new MenuItem("restartMatch", R.drawable.restart_match_icon,"Restart Match"));
+        menuItems.add(new MenuItem("quitApp", R.drawable.quit_app_icon, "Quit App"));
 
         recyclerView.setAdapter(new MainMenuAdapter(this, menuItems, new MainMenuAdapter.AdapterCallback() {
             @Override
-            public void onItemClicked(final Integer menuPosition) {
-                switch (menuPosition){
-                    case 0:  cancelMenu(); break;
-                    case 1:  nextPeriod(); break;
-                    case 2:  showSummary(); break;
-                    case 3:  restartMatch(); break;
-                    case 4:  quitApp(); break;
+            public void onItemClicked(final String menuId) {
+                switch (menuId){
+                    case "back":  cancelMenu(); break;
+                    case "nextPeriod":  nextPeriod(); break;
+                    case "matchSummary":  showSummary(); break;
+                    case "restartMatch":  restartMatch(); break;
+                    case "quitApp":  quitApp(); break;
                     default : cancelMenu();
                 }
             }
@@ -89,6 +93,14 @@ public class MainMenuActivity extends WearableActivity {
 
     public void showSummary() {
         setContentView(R.layout.match_summary);
+
+        //unhide summary sections according to current period.
+        for (int i=0 ; i <= currentPeriod; i++) {
+            LinearLayout header = findViewById(getResources().getIdentifier("period_" + i + "_header", "id", getPackageName()));
+            LinearLayout data = findViewById(getResources().getIdentifier("period_" + i + "_data", "id", getPackageName()));
+            header.setVisibility(View.VISIBLE);
+            data.setVisibility(View.VISIBLE);
+        }
 
         ArrayList<Penalty> homePens = getIntent().getParcelableArrayListExtra("homePens");
         ArrayList<Penalty> awayPens = getIntent().getParcelableArrayListExtra("awayPens");

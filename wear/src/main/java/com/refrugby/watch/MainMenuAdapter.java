@@ -16,7 +16,7 @@ public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.Recycl
 
     private ArrayList<MenuItem> dataSource = new ArrayList<MenuItem>();
     public interface AdapterCallback{
-        void onItemClicked(Integer menuPosition);
+        void onItemClicked(String menuId);
     }
     private AdapterCallback callback;
 
@@ -55,7 +55,7 @@ public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.Recycl
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, final int position) {
-        MenuItem data_provider = dataSource.get(position);
+        final MenuItem data_provider = dataSource.get(position);
 
         holder.menuItem.setText(data_provider.getText());
         holder.menuIcon.setImageResource(data_provider.getImage());
@@ -64,7 +64,7 @@ public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.Recycl
             public void onClick(final View v) {
 
                 if(callback != null) {
-                    callback.onItemClicked(position);
+                    callback.onItemClicked(data_provider.getId());
                 }
             }
         });
@@ -81,12 +81,18 @@ public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.Recycl
 
 class MenuItem
 {
+    private String id;
     private String text;
     private int image;
 
-    public MenuItem(int image, String text) {
+    public MenuItem(String id, int image, String text) {
+        this.id = id;
         this.image = image;
         this.text = text;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getText() {

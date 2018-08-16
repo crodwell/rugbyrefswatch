@@ -81,7 +81,7 @@
 
             <TextView
                 android:id="@+id/home_pen_0"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="end"
                 android:layout_marginEnd="10dp"
@@ -91,7 +91,7 @@
 
             <TextView
                 android:id="@+id/away_pen_0"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:layout_marginStart="10dp"
@@ -103,7 +103,8 @@
             android:id="@+id/period_1_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="0dp"
@@ -118,11 +119,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:visibility="gone"
             >
 
             <TextView
                 android:id="@+id/home_pen_1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="end"
                 android:layout_marginEnd="10dp"
@@ -132,7 +134,7 @@
 
             <TextView
                 android:id="@+id/away_pen_1"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:layout_marginStart="10dp"
@@ -144,7 +146,8 @@
             android:id="@+id/period_2_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="0dp"
@@ -159,11 +162,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/home_pen_2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="end"
                 android:layout_marginEnd="10dp"
@@ -173,7 +176,7 @@
 
             <TextView
                 android:id="@+id/away_pen_2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:layout_marginStart="10dp"
@@ -185,7 +188,8 @@
             android:id="@+id/period_3_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="0dp"
@@ -200,11 +204,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            >
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/home_pen_3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="end"
                 android:layout_marginEnd="10dp"
@@ -214,7 +218,7 @@
 
             <TextView
                 android:id="@+id/away_pen_3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:layout_marginStart="10dp"

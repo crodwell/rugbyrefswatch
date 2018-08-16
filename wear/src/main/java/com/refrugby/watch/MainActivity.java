@@ -218,6 +218,7 @@ public class MainActivity extends WearableActivity {
     public void menu(View v){
         Intent menu = new Intent(getApplicationContext(), MainMenuActivity.class);
         menu.putExtra("finalPeriod", (currentPeriod == periodLengths.length -1));
+        menu.putExtra("currentPeriod", currentPeriod);
         menu.putParcelableArrayListExtra("homePens", homePens);
         menu.putParcelableArrayListExtra("awayPens", awayPens);
         startActivityForResult(menu, PERIOD_SELECT);
