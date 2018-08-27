@@ -46,6 +46,13 @@
                 android:text="@string/intro_text"
                 android:textColor="@android:color/black" />
 
+            <TextView
+                android:id="@+id/information_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/thin_border"
+                />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,14 +64,20 @@
                     android:layout_height="wrap_content"
                     android:onClick="showSettings"
                     android:layout_marginEnd="50dp"
-                    android:text="@string/start" />
-
+                    android:text="@string/start"
+                    android:visibility="gone"/>
+                <Button
+                    android:id="@+id/remote_open_button"
+                    android:text="Install"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp" />
                 <Button
                     android:id="@+id/rate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="rateOnAppStore"
-                    android:text="@string/rate" />
+                    android:text="@string/rate"
+                    android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>

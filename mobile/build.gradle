@@ -33,4 +33,6 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     wearApp project(':wear')
     implementation 'com.google.android.gms:play-services-wearable:15.0.1'
+    implementation 'com.google.android.support:wearable:2.3.0'
+    compileOnly 'com.google.android.wearable:wearable:2.3.0'
 }

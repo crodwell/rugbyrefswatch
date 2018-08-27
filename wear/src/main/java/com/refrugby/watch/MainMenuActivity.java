@@ -25,6 +25,7 @@ public class MainMenuActivity extends WearableActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
+        setAmbientEnabled(); // Enables Always-on
         Intent i = getIntent();
         currentPeriod = i.getIntExtra("currentPeriod", 0);
         WearableRecyclerView recyclerView = findViewById(R.id.main_menu_view);
@@ -110,13 +111,13 @@ public class MainMenuActivity extends WearableActivity {
             TextView penTxt = findViewById(resourceID);
             Log.d("home", item.currentTime.toString());
 
-            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime)) + "\n");
+            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
         for (Penalty item:awayPens) {
             int resourceID = getResources().getIdentifier("away_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
             Log.d("away", item.currentTime.toString());
-            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime)) + "\n");
+            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
     }
 

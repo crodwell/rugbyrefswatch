@@ -25,7 +25,7 @@
             android:onClick="matchTimer"
             android:text="@string/_startTime"
             android:textColor="@android:color/black"
-            android:textSize="24sp"
+            android:textSize="34sp"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,12 +34,12 @@
         <TextView
             android:id="@+id/info_bar"
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="18dp"
             android:layout_marginTop="2dp"
             android:background="@android:drawable/bottom_bar"
             android:gravity="center"
             android:text="1st Half (40 mins)"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/match_clock" />
 
