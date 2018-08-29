@@ -29,7 +29,7 @@
                 android:text="Yellow Card Starting For\n8"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
 
             <android.support.wear.widget.CircularProgressLayout

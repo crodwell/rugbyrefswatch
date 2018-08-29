@@ -127,36 +127,55 @@ public class MainActivity extends WearableActivity {
     public class Receiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            try {
+                String serialisedSettings = intent.getExtras().get("message").toString();
+                String halfLength = StringUtils.substringBetween(serialisedSettings, "half_length:", "|");
+                String extraTimeLength = StringUtils.substringBetween(serialisedSettings, "extra_time_length:", "|");
+                String ycLength = StringUtils.substringBetween(serialisedSettings, "yc_length:", "|");
+                String homeColour = StringUtils.substringBetween(serialisedSettings, "home_colour:", "|");
+                String awayColour = StringUtils.substringBetween(serialisedSettings, "away_colour:", "|");
+                periodLengths = new long[]{Long.parseLong(halfLength) * 60000, Long.parseLong(halfLength) * 60000, Long.parseLong(extraTimeLength) * 60000, Long.parseLong(extraTimeLength) * 60000};
+                yellowCardLength = Long.parseLong(ycLength) * 60000;
+                Log.d("hex", teamBgColours.get(homeColour));
+                Log.d("int", Integer.toString(Color.parseColor(teamBgColours.get(homeColour))));
+                Log.d("hex", awayColour);
+                Button home_pen = findViewById(R.id.home_pen);
+                Button away_pen = findViewById(R.id.away_pen);
+                home_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(homeColour)));
+                home_pen.setTextColor(Color.parseColor(teamTextColours.get(homeColour)));
+                away_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(awayColour)));
+                away_pen.setTextColor(Color.parseColor(teamTextColours.get(awayColour)));
 
-            String serialisedSettings = intent.getExtras().get("message").toString();
-            String halfLength = StringUtils.substringBetween(serialisedSettings, "half_length:", "|");
-            String extraTimeLength = StringUtils.substringBetween(serialisedSettings, "extra_time_length:", "|");
-            String ycLength = StringUtils.substringBetween(serialisedSettings, "yc_length:", "|");
-            String homeColour = StringUtils.substringBetween(serialisedSettings, "home_colour:", "|");
-            String awayColour = StringUtils.substringBetween(serialisedSettings, "away_colour:", "|");
-            periodLengths = new long[]{Long.parseLong(halfLength) * 60000, Long.parseLong(halfLength) * 60000, Long.parseLong(extraTimeLength) * 60000, Long.parseLong(extraTimeLength) * 60000};
-            yellowCardLength = Long.parseLong(ycLength) * 60000;
-            Log.d("hex", teamBgColours.get(homeColour));
-            Log.d("int", Integer.toString(Color.parseColor(teamBgColours.get(homeColour))));
-            Log.d("hex", awayColour);
-            Button home_pen = findViewById(R.id.home_pen);
-            Button away_pen = findViewById(R.id.away_pen);
-            home_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(homeColour)));
-            home_pen.setTextColor(Color.parseColor(teamTextColours.get(homeColour)));
-            away_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(awayColour)));
-            away_pen.setTextColor(Color.parseColor(teamTextColours.get(awayColour)));
+                restartMatch();
+            }  catch (NullPointerException exception) {
+                // just ignore.
+            }
 
-            restartMatch();
+
         }
     }
 
     public void homePen(View v) {
+        // check last pen wasn't < 4 seconds ago (prevents accidental double-click)
+        if (homePens.size() > 0){
+            Penalty lastPen = homePens.get(homePens.size() - 1);
+            if (currentPeriod == lastPen.period && currentMatchTime - lastPen.currentTime < 4000){
+                return;
+            }
+        }
         homePens.add(new Penalty(currentMatchTime, currentPeriod));
         TextView txt = findViewById(R.id.home_pen);
         txt.setText(Integer.toString(homePens.size()));
     }
 
     public void awayPen(View v) {
+        // check last pen wasn't < 4 seconds ago (prevents accidental double-click)
+        if (awayPens.size() > 0){
+            Penalty lastPen = awayPens.get(awayPens.size() - 1);
+            if (currentPeriod == lastPen.period && currentMatchTime - lastPen.currentTime < 4000){
+                return;
+            }
+        }
         awayPens.add(new Penalty(currentMatchTime, currentPeriod));
         TextView txt = findViewById(R.id.away_pen);
         txt.setText(Integer.toString(awayPens.size()));
@@ -247,6 +266,7 @@ public class MainActivity extends WearableActivity {
             if (resultCode == RESULT_OK) {
                 String action = data.getExtras().get("action").toString();
                 if (action.equals("quit")){
+                    restartMatch(); // clears timers so they don't carry on after quit
                     finishAndRemoveTask();
                 }
                 if (action.equals("period")){
@@ -360,8 +380,10 @@ public class MainActivity extends WearableActivity {
         for (YellowCard item:awayYCs) {
             item.pauseTimer();
         }
-        homeYCs.clear();
-        awayYCs.clear();
+        homeYCs = new ArrayList<>();
+        activeHomeYCs = 0;
+        awayYCs = new ArrayList<>();
+        activeAwayYCs = 0;
         printYcStatus();
         TextView matchClock = findViewById(R.id.match_clock);
         matchClock.setText("0:00");
@@ -458,7 +480,6 @@ public class MainActivity extends WearableActivity {
 
                 if( awayYCs.get(i).expired){
                     awayYc.setTextColor(Color.RED);
-//                    (findViewById(R.id.ackYc)).setVisibility(View.VISIBLE);
                 } else {
                     awayYc.setTextColor(Color.BLACK);
                 }
@@ -550,10 +571,6 @@ class Penalty implements Parcelable {
         this.currentTime = currentTime;
         this.period = period;
     }
-
-    /******************************************/
-    /********** Parcelable interface **********/
-    /******************************************/
 
     @Override
     public int describeContents() { // (2)

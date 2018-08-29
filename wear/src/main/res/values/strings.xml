@@ -8,8 +8,8 @@
     <string name="_startingNextPeriod">Starting Next Period</string>
     <string name="_restartMatch">Restart Match</string>
     <string name="_restartingMatch">Restarting Match</string>
-    <string name="_quitApp">Quit App</string>
-    <string name="_quittingApp">Quitting App</string>
+    <string name="_quitApp">Quit</string>
+    <string name="_quittingApp">Quitting</string>
     <string name="_cancel">Cancel</string>
     <string name="_matchSummary">Match Summary</string>
     <string name="_firstHalf">1st Half</string>

@@ -42,7 +42,7 @@ public class MainMenuActivity extends WearableActivity {
         menuItems.add(new MenuItem("restartMatch", R.drawable.restart_match_icon,"Restart Match"));
         menuItems.add(new MenuItem("quitApp", R.drawable.quit_app_icon, "Quit App"));
 
-        recyclerView.setAdapter(new MainMenuAdapter(this, menuItems, new MainMenuAdapter.AdapterCallback() {
+        recyclerView.setAdapter(new MainMenuAdapter(menuItems, new MainMenuAdapter.AdapterCallback() {
             @Override
             public void onItemClicked(final String menuId) {
                 switch (menuId){

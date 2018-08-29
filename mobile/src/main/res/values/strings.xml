@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">Rugby Referee Watch</string>
     <string name="action_settings">Settings</string>
-    <string name="intro_text"><b>IMPORTANT:</b>\nAn smart watch with Wear OS 2.0 or greater connected to this phone via bluetooth is required to use this companion app.\n\n
-<b>DISCLAIMER:</b>\nThis software is provided free of charge as a tool to track match time, yellow cards, penalties and match statistics.\n\nAny software has the potential to crash so never rely on this app to keep score and ALWAYS wear a backup watch to save embarrassment!\n\nIf this app is helpful, please leave me a positive review on the play store. Feature requests welcome.\n\n
-<b>INSTRUCTIONS:</b>\n
+    <string name="intro_text"><b>IMPORTANT:</b>\nA smart watch with Wear OS 2.0 or greater connected to this phone via bluetooth is required to use this companion app.\n\n<b>DISCLAIMER:</b>\nThis software is provided free of charge as a tool to track match time, yellow cards, penalties and match statistics.\n\nAny software has the potential to crash so never rely on this app to keep score and ALWAYS wear a backup watch to save embarrassment!\n\nIf this app is helpful, please leave me a positive review on the play store. Feature requests welcome.\n\n<b>INSTRUCTIONS:</b>\n
 * Once the Wear OS app is installed, click start to manage match settings.\n\n
 * Select period and yellow card durations, team colours and send to the smart watch before the match commences.\n\n
 * Click match time to start/stop all timers. Watch will vibrate to remind you when match clock is paused.\n\n
@@ -17,6 +15,7 @@
     <string name="save">Send to Watch</string>
     <string name="start">Start</string>
     <string name="install">Install</string>
+    <string name="status">Smart Watch Status:</string>
 
     <string name="home_colour">Home Colour</string>
     <string name="away_colour">Away Colour</string>

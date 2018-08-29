@@ -33,11 +33,11 @@ import com.google.android.wearable.intent.RemoteIntent;
 
 public class MainActivity extends AppCompatActivity implements CapabilityClient.OnCapabilityChangedListener {
     private static final String TAG = "MainMobileActivity";
-    private static final String CHECKING_MESSAGE = "Checking for Wear Devices with Rugby Refs Watch...\n";
+    private static final String CHECKING_MESSAGE = "Checking for Rugby Referee Watch on smart watch...\n";
     private static final String NO_DEVICES = "You have no Wear devices linked to your phone. Please pair a Wear 2.0 or greater smart watch before using this app.\n";
-    private static final String MISSING_ALL_MESSAGE = "Cannot detect Rugby Ref Watch on a connected smart watch, please click install to attempt installation.\n";
+    private static final String MISSING_ALL_MESSAGE = "Cannot detect Rugby Referee Watch on a connected smart watch, please click install to attempt installation.\n";
 //    private static final String INSTALLED_SOME_DEVICES_MESSAGE = "Rugby Ref Watch is installed on your smart watch.\n";
-    private static final String INSTALLED_ALL_DEVICES_MESSAGE = "Rugby Ref Watch is installed on your smart watch.\n";
+    private static final String INSTALLED_ALL_DEVICES_MESSAGE = "Rugby Referee Watch is installed on your smart watch.\n";
     private static final String CAPABILITY_WEAR_APP = "wear_rugby_ref_watch";
     private static final String PLAY_STORE_APP_URI = "market://details?id=com.refrugby.watch";
 
@@ -199,8 +199,6 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
 
         }
 //        else if (mWearNodesWithApp.size() < mAllConnectedNodes.size()) {
-//            // TODO: Add your code to communicate with the wear app(s) via
-//            // Wear APIs (MessageApi, DataApi, etc.)
 //
 //            String installMessage =
 //                    String.format(INSTALLED_SOME_DEVICES_MESSAGE, mWearNodesWithApp);
@@ -212,11 +210,7 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
 //
 //        }
         else {
-            // TODO: Add your code to communicate with the wear app(s) via
-            // Wear APIs (MessageApi, DataApi, etc.)
-
-            String installMessage =
-                    String.format(INSTALLED_ALL_DEVICES_MESSAGE, mWearNodesWithApp);
+            String installMessage = String.format(INSTALLED_ALL_DEVICES_MESSAGE, mWearNodesWithApp);
             Log.d(TAG, installMessage);
             mInformationTextView.setText(installMessage);
             mRemoteOpenButton.setVisibility(View.INVISIBLE);
@@ -257,23 +251,6 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
     }
 
 
-
-
-
-
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//        Wearable.getCapabilityClient(this)
-//                .addListener(
-//                        this, Uri.parse("wear://"), CapabilityClient.FILTER_REACHABLE);
-
-//        showNodes();
-//        new CheckConnectivityThread().start();
-//    }
-
     public void showSettings(View v){
         setContentView(R.layout.watch_settings);
         Spinner awayColour = findViewById(R.id.away_colour);
@@ -292,38 +269,6 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
 
         new MessageThread("/rrw_settings", serialisedSettings).start();
     }
-
-
-//    class CheckConnectivityThread extends Thread {
-//
-//
-//        public void run() {
-//            Log.d(TAG, "starting check");
-//            //Retrieve the connected devices, known as nodes//
-//            Task<List<Node>> wearableList =
-//                    Wearable.getNodeClient(getApplicationContext()).getConnectedNodes();
-//            try {
-//
-//                List<Node> nodes = Tasks.await(wearableList);
-//
-//                if (nodes.size() > 0) {
-//                    Log.d(TAG, "watch connected!");
-//                } else {
-//                    Log.d(TAG, "watch disconnected!");
-//                }
-//
-////                for (Node node : nodes) {
-////                    Task<Integer> sendMessageTask = Wearable.getMessageClient(MainActivity.this).sendMessage(node.getId(), path, message.getBytes());
-////                }
-//
-//            } catch (ExecutionException exception) {
-//                Log.d(TAG, "error1");
-//            } catch (InterruptedException exception) {
-//                Log.d(TAG, "error2");
-//            }
-//        }
-//    }
-
 
     class MessageThread extends Thread {
         String path;
@@ -370,28 +315,5 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
                     Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
         }
     }
-
-//    private void showNodes() {
-//
-//        Task<Map<String, CapabilityInfo>> capabilitiesTask =
-//                Wearable.getCapabilityClient(this)
-//                        .getAllCapabilities(CapabilityClient.FILTER_REACHABLE);
-//
-//        capabilitiesTask.addOnSuccessListener(new OnSuccessListener<CapabilityInfo>() {
-//
-//            @Override
-//            public void onSuccess(String capability, CapabilityInfo capabilityInfo) {
-//
-//                for (Node node : capabilityInfo.getNodes()) {
-//
-//                    if (node.isNearby()) {
-//
-//                        //Do something
-//                        break;
-//                    }
-//                }
-//            }
-//        });
-//    }
 
 }

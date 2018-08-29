@@ -1,7 +1,5 @@
 package com.refrugby.watch;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -14,18 +12,13 @@ import java.util.ArrayList;
 
 public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.RecyclerViewHolder> {
 
-    private ArrayList<MenuItem> dataSource = new ArrayList<MenuItem>();
+    private ArrayList<MenuItem> dataSource;
     public interface AdapterCallback{
         void onItemClicked(String menuId);
     }
     private AdapterCallback callback;
 
-    private String drawableIcon;
-    private Context context;
-
-
-    public MainMenuAdapter(Context context, ArrayList<MenuItem> dataArgs, AdapterCallback callback){
-        this.context = context;
+    public MainMenuAdapter(ArrayList<MenuItem> dataArgs, AdapterCallback callback){
         this.dataSource = dataArgs;
         this.callback = callback;
     }
@@ -33,10 +26,7 @@ public class MainMenuAdapter extends RecyclerView.Adapter<MainMenuAdapter.Recycl
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.main_menu_item,parent,false);
-
-        RecyclerViewHolder recyclerViewHolder = new RecyclerViewHolder(view);
-
-        return recyclerViewHolder;
+        return new RecyclerViewHolder(view);
     }
 
     public static class RecyclerViewHolder extends RecyclerView.ViewHolder
