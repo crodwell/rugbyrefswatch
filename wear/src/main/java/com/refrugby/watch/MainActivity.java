@@ -93,9 +93,11 @@ public class MainActivity extends WearableActivity {
             @Override
             public boolean onLongClick(View v) {
                 if (homePens.size() > 0){
-                    homePens.remove(homePens.size() - 1);
-                    TextView txt = findViewById(v.getId());
-                    txt.setText(Integer.toString(homePens.size()));
+                    if (homePens.get(homePens.size() - 1).yellowCard == false){
+                        homePens.remove(homePens.size() - 1);
+                        TextView txt = findViewById(v.getId());
+                        txt.setText(Integer.toString(homePens.size()));
+                    }
                 }
                 return true;
             }
@@ -106,9 +108,11 @@ public class MainActivity extends WearableActivity {
             @Override
             public boolean onLongClick(View v) {
                 if (awayPens.size() > 0){
-                    awayPens.remove(awayPens.size() - 1);
-                    TextView txt = findViewById(v.getId());
-                    txt.setText(Integer.toString(awayPens.size()));
+                    if (awayPens.get(awayPens.size() - 1).yellowCard == false) {
+                        awayPens.remove(awayPens.size() - 1);
+                        TextView txt = findViewById(v.getId());
+                        txt.setText(Integer.toString(awayPens.size()));
+                    }
                 }
                 return true;
             }
@@ -163,9 +167,8 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        homePens.add(new Penalty(currentMatchTime, currentPeriod));
-        TextView txt = findViewById(R.id.home_pen);
-        txt.setText(Integer.toString(homePens.size()));
+        homePens.add(new Penalty(currentMatchTime, currentPeriod, false));
+        ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
     }
 
     public void awayPen(View v) {
@@ -176,9 +179,8 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        awayPens.add(new Penalty(currentMatchTime, currentPeriod));
-        TextView txt = findViewById(R.id.away_pen);
-        txt.setText(Integer.toString(awayPens.size()));
+        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false));
+        ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
     }
 
     public void homeYC(View v){
@@ -255,9 +257,14 @@ public class MainActivity extends WearableActivity {
                 if (side.equals("home")){
                     homeYCs.add(new YellowCard(this, player, yellowCardLength));
                     activeHomeYCs++;
+                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true));
+                    ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
                 } else {
                     awayYCs.add(new YellowCard(this, player, yellowCardLength));
                     activeAwayYCs++;
+                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true));
+                    ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
+
                 }
             }
         }
@@ -566,10 +573,12 @@ class YellowCard {
 class Penalty implements Parcelable {
     public Long currentTime;
     public int period;
+    public boolean yellowCard;
 
-    public Penalty (Long currentTime, int period){
+    public Penalty (Long currentTime, int period, boolean yellowCard){
         this.currentTime = currentTime;
         this.period = period;
+        this.yellowCard = yellowCard;
     }
 
     @Override
@@ -582,12 +591,14 @@ class Penalty implements Parcelable {
     {
         out.writeLong(currentTime);
         out.writeInt(period);
+        out.writeByte((byte) (yellowCard ? 1 : 0));
     }
 
     private static Penalty readFromParcel(Parcel in) { // (4)
         Long currentTime = in.readLong();
         int period = in.readInt();
-        return new Penalty(currentTime, period);
+        boolean yellowCard = in.readByte() != 0;
+        return new Penalty(currentTime, period, yellowCard);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() // (5)

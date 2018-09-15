@@ -110,14 +110,13 @@ public class MainMenuActivity extends WearableActivity {
             int resourceID = getResources().getIdentifier("home_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
             Log.d("home", item.currentTime.toString());
-
-            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
+            penTxt.setText(penTxt.getText().toString() + (item.yellowCard ? "YC " : "") + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
         for (Penalty item:awayPens) {
             int resourceID = getResources().getIdentifier("away_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
             Log.d("away", item.currentTime.toString());
-            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
+            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC" : "") +"\n");
         }
     }
 
