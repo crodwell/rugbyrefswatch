@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class MainActivity extends WearableActivity {
 
-    private int matchTimerState;
+    private int matchTimerState;  // 0 = Initial, 1 = Running, 2 = Paused
     private CountDownTimer matchTimer;
     private CountDownTimer matchPauseTimer;
     private long currentMatchTime;
@@ -41,6 +41,7 @@ public class MainActivity extends WearableActivity {
     private String[] periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
     private long[] periodLengths = new long[]{2400000, 2400000, 600000, 600000};
     private long yellowCardLength = 600000L;
+    private String[] teamColourList = new String[]{"Blue", "White", "Red", "Black", "Gold", "Green", "Purple", "Silver"};
 
     private boolean halfTimeHooter;
 
@@ -50,6 +51,8 @@ public class MainActivity extends WearableActivity {
     ArrayList<YellowCard> awayYCs = new ArrayList<>();
     private int activeHomeYCs = 0;
     private int activeAwayYCs = 0;
+    private Integer homeColourCode = 0;
+    private Integer awayColourCode = 3;
 
     //Activity Request Code Constants
     static final int YELLOW_CARD = 100;
@@ -66,6 +69,7 @@ public class MainActivity extends WearableActivity {
         teamBgColours.put("Gold", "#FFC300");
         teamBgColours.put("Green", "#146230");
         teamBgColours.put("Purple", "#421462");
+        teamBgColours.put("Silver", "#CCCCCC");
     }
 
     private static final Map<String, String> teamTextColours;
@@ -79,6 +83,7 @@ public class MainActivity extends WearableActivity {
         teamTextColours.put("Gold", "#000000");
         teamTextColours.put("Green", "#FFFFFF");
         teamTextColours.put("Purple", "#FFFFFF");
+        teamTextColours.put("Silver", "#000000");
     }
 
 
@@ -160,6 +165,18 @@ public class MainActivity extends WearableActivity {
     }
 
     public void homePen(View v) {
+        // if match hasn't started yet, change colour
+        if (currentMatchTime == 0 && currentPeriod == 0){
+            if (homeColourCode == (teamColourList.length - 1)){
+                homeColourCode = 0;
+            } else {
+                homeColourCode++;
+            }
+            findViewById(R.id.home_pen).setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[homeColourCode])));
+            ((TextView)findViewById(R.id.home_pen)).setTextColor(Color.parseColor(teamTextColours.get(teamColourList[homeColourCode])));
+            return;
+        }
+
         // check last pen wasn't < 4 seconds ago (prevents accidental double-click)
         if (homePens.size() > 0){
             Penalty lastPen = homePens.get(homePens.size() - 1);
@@ -172,6 +189,18 @@ public class MainActivity extends WearableActivity {
     }
 
     public void awayPen(View v) {
+        // if match hasn't started yet, change colour
+        if (currentMatchTime == 0 && currentPeriod == 0){
+            if (awayColourCode == (teamColourList.length - 1)){
+                awayColourCode = 0;
+            } else {
+                awayColourCode++;
+            }
+            findViewById(R.id.away_pen).setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[awayColourCode])));
+            ((TextView)findViewById(R.id.away_pen)).setTextColor(Color.parseColor(teamTextColours.get(teamColourList[awayColourCode])));
+            return;
+        }
+
         // check last pen wasn't < 4 seconds ago (prevents accidental double-click)
         if (awayPens.size() > 0){
             Penalty lastPen = awayPens.get(awayPens.size() - 1);
@@ -294,7 +323,7 @@ public class MainActivity extends WearableActivity {
                     if (matchTimerState > 0) {
                         matchTimer.cancel();
                     }
-                    if (matchTimerState == 2) {
+                    if (matchTimerState == 2) { // if match is paused, kill the vibrate timer
                         matchPauseTimer.cancel();
                     }
                     halfTimeHooter = false;
@@ -387,10 +416,15 @@ public class MainActivity extends WearableActivity {
         for (YellowCard item:awayYCs) {
             item.pauseTimer();
         }
+        homePens = new ArrayList<>();
         homeYCs = new ArrayList<>();
         activeHomeYCs = 0;
+
+        awayPens = new ArrayList<>();
         awayYCs = new ArrayList<>();
         activeAwayYCs = 0;
+
+
         printYcStatus();
         TextView matchClock = findViewById(R.id.match_clock);
         matchClock.setText("0:00");

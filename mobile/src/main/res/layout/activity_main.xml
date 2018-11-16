@@ -58,7 +58,7 @@
             <TextView
                 android:id="@+id/information_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
+                android:layout_height="40dp"
                 android:layout_marginLeft="15dp"
                 android:textStyle="italic"
                 android:textColor="#a3101a"

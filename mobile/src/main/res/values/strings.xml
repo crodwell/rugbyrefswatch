@@ -6,6 +6,7 @@
 * Select period and yellow card durations, team colours and send to the smart watch before the match commences.\n\n
 * Click match time to start/stop all timers. Watch will vibrate to remind you when match clock is paused.\n\n
 * Press the centre menu button to move to next period or restart match.\n\n
+* Pressing the penalty buttons before match starts will cycle team colours.\n\n
 * Long pressing the penalty counters will reverse the count.\n\n\n
 <a href="http://www.refrugby.com">www.refrugby.com</a>\n\n</string>
     <string name="half_length">Half Length</string>
