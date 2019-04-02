@@ -20,6 +20,8 @@ import java.util.ArrayList;
 public class MainMenuActivity extends WearableActivity {
 
     private Integer currentPeriod;
+    private Long currentMatchTime;
+    private boolean u19;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,8 @@ public class MainMenuActivity extends WearableActivity {
         setAmbientEnabled(); // Enables Always-on
         Intent i = getIntent();
         currentPeriod = i.getIntExtra("currentPeriod", 0);
+        currentMatchTime = i.getLongExtra("currentMatchTime", 0);
+        u19 = i.getBooleanExtra("u19", false);
         WearableRecyclerView recyclerView = findViewById(R.id.main_menu_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setEdgeItemsCenteringEnabled(true);
@@ -39,6 +43,14 @@ public class MainMenuActivity extends WearableActivity {
             menuItems.add(new MenuItem("nextPeriod", R.drawable.next_period_icon,"Next Period"));
         }
         menuItems.add(new MenuItem("matchSummary", R.drawable.summary_icon,"Match Summary"));
+        if (currentPeriod == 0 && currentMatchTime == 0){
+            if (!u19){
+                menuItems.add(new MenuItem("switchU19", R.drawable.next_period_icon,"U19 Match Time"));
+            } else {
+                menuItems.add(new MenuItem("switchU19", R.drawable.next_period_icon,"Adult Match Time"));
+            }
+        }
+
         menuItems.add(new MenuItem("restartMatch", R.drawable.restart_match_icon,"Restart Match"));
         menuItems.add(new MenuItem("quitApp", R.drawable.quit_app_icon, "Quit App"));
 
@@ -49,6 +61,7 @@ public class MainMenuActivity extends WearableActivity {
                     case "back":  cancelMenu(); break;
                     case "nextPeriod":  nextPeriod(); break;
                     case "matchSummary":  showSummary(); break;
+                    case "switchU19":  switchU19(); break;
                     case "restartMatch":  restartMatch(); break;
                     case "quitApp":  quitApp(); break;
                     default : cancelMenu();
@@ -64,6 +77,13 @@ public class MainMenuActivity extends WearableActivity {
 
     public void cancelMenu(){
         setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    public void switchU19(){
+        Intent i = new Intent();
+        i.putExtra("action","u19");
+        setResult(RESULT_OK,i);
         finish();
     }
 

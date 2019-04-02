@@ -38,9 +38,14 @@ public class MainActivity extends WearableActivity {
     private long currentMatchTime;
 
     private int currentPeriod = 0;
+    private boolean u19 = false;
     private String[] periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
     private long[] periodLengths = new long[]{2400000, 2400000, 600000, 600000};
     private long yellowCardLength = 600000L;
+    // for testing
+    // private long[] periodLengths = new long[]{60000, 2400000, 600000, 600000};
+    // private long yellowCardLength = 60000L;
+
     private String[] teamColourList = new String[]{"Blue", "White", "Red", "Black", "Gold", "Green", "Purple", "Silver"};
 
     private boolean halfTimeHooter;
@@ -56,7 +61,7 @@ public class MainActivity extends WearableActivity {
 
     //Activity Request Code Constants
     static final int YELLOW_CARD = 100;
-    static final int PERIOD_SELECT = 200;
+    static final int MAIN_MENU = 200;
 
     private static final Map<String, String> teamBgColours;
     static
@@ -267,11 +272,13 @@ public class MainActivity extends WearableActivity {
 
     public void menu(View v){
         Intent menu = new Intent(getApplicationContext(), MainMenuActivity.class);
+        menu.putExtra("currentMatchTime", currentMatchTime);
+        menu.putExtra("u19", u19);
         menu.putExtra("finalPeriod", (currentPeriod == periodLengths.length -1));
         menu.putExtra("currentPeriod", currentPeriod);
         menu.putParcelableArrayListExtra("homePens", homePens);
         menu.putParcelableArrayListExtra("awayPens", awayPens);
-        startActivityForResult(menu, PERIOD_SELECT);
+        startActivityForResult(menu, MAIN_MENU);
     }
 
     @Override
@@ -298,7 +305,7 @@ public class MainActivity extends WearableActivity {
             }
         }
 
-        if (requestCode == PERIOD_SELECT){
+        if (requestCode == MAIN_MENU){
             if (resultCode == RESULT_OK) {
                 String action = data.getExtras().get("action").toString();
                 if (action.equals("quit")){
@@ -332,6 +339,19 @@ public class MainActivity extends WearableActivity {
 
                 }
                 if (action.equals("restart")){
+                    restartMatch();
+                }
+
+                if (action.equals("u19")){
+                    if (!u19){
+                        u19 = true;
+                        periodLengths = new long[]{35 * 60000, 35 * 60000, 10 * 60000, 10 * 60000};
+                        yellowCardLength = 7 * 60000;
+                    } else {
+                        u19 = false;
+                        periodLengths = new long[]{40 * 60000, 40 * 60000, 10 * 60000, 10 * 60000};
+                        yellowCardLength = 40 * 60000;
+                    }
                     restartMatch();
                 }
             }
@@ -435,7 +455,7 @@ public class MainActivity extends WearableActivity {
         currentPeriod = 0;
         currentMatchTime = 0L;
         TextView infoBar = findViewById(R.id.info_bar);
-        infoBar.setText(periodLabels[currentPeriod] + "(" + Long.toString(periodLengths[currentPeriod] / 60000) + " mins)");
+        infoBar.setText(periodLabels[currentPeriod] + " (" + Long.toString(periodLengths[currentPeriod] / 60000) + " mins)");
         ((TextView)findViewById(R.id.home_pen)).setText("0");
         ((TextView)findViewById(R.id.away_pen)).setText("0");
     }
