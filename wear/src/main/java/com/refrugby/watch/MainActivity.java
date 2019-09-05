@@ -3,11 +3,15 @@ package com.refrugby.watch;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.wearable.activity.WearableActivity;
+import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Button;
 import android.view.View;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
@@ -15,7 +19,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -23,6 +27,7 @@ import android.graphics.Color;
 import android.view.View.OnLongClickListener;
 import android.util.Log;
 import android.os.Parcel;
+import android.widget.LinearLayout;
 
 
 
@@ -40,11 +45,11 @@ public class MainActivity extends WearableActivity {
     private int currentPeriod = 0;
     private boolean u19 = false;
     private String[] periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
-    private long[] periodLengths = new long[]{2400000, 2400000, 600000, 600000};
-    private long yellowCardLength = 600000L;
+    private long[] periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
+    private long yellowCardLength = (10 * 60000L);
     // for testing
-    // private long[] periodLengths = new long[]{60000, 2400000, 600000, 600000};
-    // private long yellowCardLength = 60000L;
+    // private long[] periodLengths = new long[]{*(1 *60000), (1*60000), (0.5 * 60000), (0.5 * 50000)};
+    // private long yellowCardLength = (1 * 60000L);
 
     private String[] teamColourList = new String[]{"Blue", "White", "Red", "Black", "Gold", "Green", "Purple", "Silver"};
 
@@ -103,10 +108,11 @@ public class MainActivity extends WearableActivity {
             @Override
             public boolean onLongClick(View v) {
                 if (homePens.size() > 0){
-                    if (homePens.get(homePens.size() - 1).yellowCard == false){
+                    if (!homePens.get(homePens.size() - 1).yellowCard){
                         homePens.remove(homePens.size() - 1);
                         TextView txt = findViewById(v.getId());
                         txt.setText(Integer.toString(homePens.size()));
+                        drawPenaltyHistory();
                     }
                 }
                 return true;
@@ -118,10 +124,11 @@ public class MainActivity extends WearableActivity {
             @Override
             public boolean onLongClick(View v) {
                 if (awayPens.size() > 0){
-                    if (awayPens.get(awayPens.size() - 1).yellowCard == false) {
+                    if (!awayPens.get(awayPens.size() - 1).yellowCard) {
                         awayPens.remove(awayPens.size() - 1);
                         TextView txt = findViewById(v.getId());
                         txt.setText(Integer.toString(awayPens.size()));
+                        drawPenaltyHistory();
                     }
                 }
                 return true;
@@ -134,7 +141,6 @@ public class MainActivity extends WearableActivity {
         Receiver messageReceiver = new Receiver();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, newFilter);
-
 
     }
 
@@ -189,8 +195,9 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        homePens.add(new Penalty(currentMatchTime, currentPeriod, false));
+        homePens.add(new Penalty(currentMatchTime, currentPeriod, false, "home"));
         ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
+        drawPenaltyHistory();
     }
 
     public void awayPen(View v) {
@@ -213,11 +220,72 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false));
+        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false, "away"));
         ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
+        drawPenaltyHistory();
+    }
+
+    public void drawPenaltyHistory(){
+        ArrayList<Penalty> allPens = new ArrayList<>();
+        allPens.addAll(homePens);
+        allPens.addAll(awayPens);
+
+
+        // Sorts Penalties by half, then time, most recent first.
+         Collections.sort(allPens, new Comparator<Penalty>() {
+
+            public int compare(Penalty o2, Penalty o1) {
+
+                Integer p1 = o1.getPeriod();
+                Integer p2 = o2.getPeriod();
+                int sComp = p1.compareTo(p2);
+
+                if (sComp != 0) {
+                    return sComp;
+                }
+
+                Long t1 = o1.getCurrentTime();
+                Long t2 = o2.getCurrentTime();
+                return t1.compareTo(t2);
+            }});
+
+        LinearLayout linearLayout = findViewById(R.id.penalty_history);
+        linearLayout.removeAllViews();
+        int i = 0;
+        for (Penalty item:allPens) {
+            i++;
+            TextView drawablePen = new TextView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            if (linearLayout.getWidth() < (31 * i)){ // if too big for screen, don't print any more.
+                break;
+            }
+
+
+            params.setMargins(0,-5, 1, 0);
+            params.height = LinearLayout.LayoutParams.MATCH_PARENT;
+            drawablePen.setLayoutParams(params);
+            if (item.side == "home") {
+                drawablePen.setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[homeColourCode])));
+                drawablePen.setTextColor(Color.parseColor(teamTextColours.get(teamColourList[homeColourCode])));
+            } else {
+                drawablePen.setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[awayColourCode])));
+                drawablePen.setTextColor(Color.parseColor(teamTextColours.get(teamColourList[awayColourCode])));
+            }
+            drawablePen.setWidth(30);
+            drawablePen.setTextSize(10);
+            drawablePen.setGravity(Gravity.CENTER);
+            drawablePen.setText(String.format(Locale.getDefault(), "%d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime)));
+
+            linearLayout.addView(drawablePen);
+        }
+
+
+
     }
 
     public void homeYC(View v){
+        // check list for expired timers, and acknowledge before creating new ones
         boolean foundExpiredYC = false;
         for (YellowCard item:homeYCs) {
             if (item.expired && !item.acknowledged) {
@@ -293,15 +361,15 @@ public class MainActivity extends WearableActivity {
                 if (side.equals("home")){
                     homeYCs.add(new YellowCard(this, player, yellowCardLength));
                     activeHomeYCs++;
-                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true));
+                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true, "home"));
                     ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
                 } else {
                     awayYCs.add(new YellowCard(this, player, yellowCardLength));
                     activeAwayYCs++;
-                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true));
+                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true, "away"));
                     ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
-
                 }
+                drawPenaltyHistory();
             }
         }
 
@@ -345,12 +413,12 @@ public class MainActivity extends WearableActivity {
                 if (action.equals("u19")){
                     if (!u19){
                         u19 = true;
-                        periodLengths = new long[]{35 * 60000, 35 * 60000, 10 * 60000, 10 * 60000};
-                        yellowCardLength = 7 * 60000;
+                        periodLengths = new long[]{(35 * 60000), (35 * 60000), (10 * 60000), (10 * 60000)};
+                        yellowCardLength = (7 * 60000L);
                     } else {
                         u19 = false;
-                        periodLengths = new long[]{40 * 60000, 40 * 60000, 10 * 60000, 10 * 60000};
-                        yellowCardLength = 40 * 60000;
+                        periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
+                        yellowCardLength = (10 * 60000L);
                     }
                     restartMatch();
                 }
@@ -363,15 +431,7 @@ public class MainActivity extends WearableActivity {
         switch (matchTimerState) {
             case 1: // Pause Timers
                 matchTimer.cancel();
-
-                for (YellowCard item : homeYCs) {
-                    item.pauseTimer();
-                }
-                for (YellowCard item : awayYCs) {
-                    item.pauseTimer();
-                }
-
-
+                pauseYellowCardTimers();
                 matchTimerState = 2;
 
                 matchPauseTimer = new CountDownTimer(300000, 20000) { // vibrate every 20 seconds for 5 mins while match is paused
@@ -392,33 +452,37 @@ public class MainActivity extends WearableActivity {
                 startMatchClock(currentMatchTime);
                 matchTimerState = 1;
                 matchPauseTimer.cancel();
-
-                for (YellowCard item : homeYCs) {
-                    if (!item.expired) {
-                        item.restartTimer();
-                    }
-                }
-                for (YellowCard item : awayYCs) {
-                    if (!item.expired) {
-                        item.restartTimer();
-                    }
-                }
+                restartYellowCardTimers();
                 break;
 
             default: // Start Timer
                 startMatchClock(0);
                 matchTimerState = 1;
                 // restart YC timers as this may be start of next period
-                for (YellowCard item : homeYCs) {
-                    if (!item.expired) {
-                        item.restartTimer();
-                    }
-                }
-                for (YellowCard item : awayYCs) {
-                    if (!item.expired) {
-                        item.restartTimer();
-                    }
-                }
+                restartYellowCardTimers();
+        }
+    }
+
+    public void pauseYellowCardTimers() {
+        for (YellowCard item : homeYCs) {
+            item.pauseTimer();
+        }
+        for (YellowCard item : awayYCs) {
+            item.pauseTimer();
+        }
+    }
+
+
+    public void restartYellowCardTimers() {
+        for (YellowCard item : homeYCs) {
+            if (!item.expired) {
+                item.restartTimer();
+            }
+        }
+        for (YellowCard item : awayYCs) {
+            if (!item.expired) {
+                item.restartTimer();
+            }
         }
     }
 
@@ -430,12 +494,8 @@ public class MainActivity extends WearableActivity {
             matchPauseTimer.cancel();
         }
 
-        for (YellowCard item:homeYCs) {
-            item.pauseTimer();
-        }
-        for (YellowCard item:awayYCs) {
-            item.pauseTimer();
-        }
+        pauseYellowCardTimers(); // we kill the timers and overwrite YC objects next
+
         homePens = new ArrayList<>();
         homeYCs = new ArrayList<>();
         activeHomeYCs = 0;
@@ -444,6 +504,7 @@ public class MainActivity extends WearableActivity {
         awayYCs = new ArrayList<>();
         activeAwayYCs = 0;
 
+        drawPenaltyHistory();
 
         printYcStatus();
         TextView matchClock = findViewById(R.id.match_clock);
@@ -458,6 +519,7 @@ public class MainActivity extends WearableActivity {
         infoBar.setText(periodLabels[currentPeriod] + " (" + Long.toString(periodLengths[currentPeriod] / 60000) + " mins)");
         ((TextView)findViewById(R.id.home_pen)).setText("0");
         ((TextView)findViewById(R.id.away_pen)).setText("0");
+
     }
 
     private void startMatchClock(long millisInFuture){
@@ -470,7 +532,7 @@ public class MainActivity extends WearableActivity {
             public void onTick(long millisUntilFinished) {
 
                 currentMatchTime = bigLong - millisUntilFinished;
-                txt.setText(""+String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
+                txt.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
                         TimeUnit.MILLISECONDS.toSeconds(currentMatchTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentMatchTime))));
                 if (currentMatchTime > periodLengths[currentPeriod] && !halfTimeHooter) {
                     txt.setBackgroundColor(Color.RED);
@@ -515,7 +577,7 @@ public class MainActivity extends WearableActivity {
                 }
 
                 if (homeYcTextview < 1 || activeHomeYCs == 2) {
-                    homeYCText = homeYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
+                    homeYCText = homeYCs.get(i).player + " " + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
                             TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
                     homeYc.setText(homeYCText);
                     homeYcTextview++;
@@ -552,7 +614,7 @@ public class MainActivity extends WearableActivity {
                 }
 
                 if (awayYcTextview < 1 || activeAwayYCs == 2) { //always print item if first in list or 2 total
-                    awayYCText = awayYCs.get(i).player + " " + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
+                    awayYCText = awayYCs.get(i).player + " " + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
                             TimeUnit.MILLISECONDS.toSeconds(awayYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime))) + "\n";
                     awayYc.setText(awayYCText);
                     awayYcTextview++;
@@ -600,6 +662,8 @@ class YellowCard {
     }
 
     public void pauseTimer() {
+    Log.d("TAG", "Paused YC timer");
+
         ycTimer.cancel();
     }
 
@@ -628,11 +692,13 @@ class Penalty implements Parcelable {
     public Long currentTime;
     public int period;
     public boolean yellowCard;
+    public String side;
 
-    public Penalty (Long currentTime, int period, boolean yellowCard){
+    public Penalty (Long currentTime, int period, boolean yellowCard, String side){
         this.currentTime = currentTime;
         this.period = period;
         this.yellowCard = yellowCard;
+        this.side = side;
     }
 
     @Override
@@ -646,13 +712,15 @@ class Penalty implements Parcelable {
         out.writeLong(currentTime);
         out.writeInt(period);
         out.writeByte((byte) (yellowCard ? 1 : 0));
+        out.writeString(side);
     }
 
     private static Penalty readFromParcel(Parcel in) { // (4)
         Long currentTime = in.readLong();
         int period = in.readInt();
         boolean yellowCard = in.readByte() != 0;
-        return new Penalty(currentTime, period, yellowCard);
+        String side = in.readString();
+        return new Penalty(currentTime, period, yellowCard, side);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() // (5)
@@ -666,6 +734,14 @@ class Penalty implements Parcelable {
             return new Penalty[size];
         }
     };
+
+    public int getPeriod() {
+        return period;
+    }
+
+    public Long getCurrentTime() {
+        return currentTime;
+    }
 }
 
 

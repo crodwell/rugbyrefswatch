@@ -1,8 +1,8 @@
 package com.refrugby.watch;
 
-import android.support.wear.widget.CircularProgressLayout;
-import android.support.wear.widget.WearableLinearLayoutManager;
-import android.support.wear.widget.WearableRecyclerView;
+import androidx.wear.widget.CircularProgressLayout;
+import androidx.wear.widget.WearableLinearLayoutManager;
+import androidx.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import java.util.ArrayList;
@@ -58,7 +59,6 @@ public class MainMenuActivity extends WearableActivity {
             @Override
             public void onItemClicked(final String menuId) {
                 switch (menuId){
-                    case "back":  cancelMenu(); break;
                     case "nextPeriod":  nextPeriod(); break;
                     case "matchSummary":  showSummary(); break;
                     case "switchU19":  switchU19(); break;
@@ -115,7 +115,7 @@ public class MainMenuActivity extends WearableActivity {
     public void showSummary() {
         setContentView(R.layout.match_summary);
 
-        //unhide summary sections according to current period.
+        // Un hide summary sections according to current period.
         for (int i=0 ; i <= currentPeriod; i++) {
             LinearLayout header = findViewById(getResources().getIdentifier("period_" + i + "_header", "id", getPackageName()));
             LinearLayout data = findViewById(getResources().getIdentifier("period_" + i + "_data", "id", getPackageName()));
@@ -130,13 +130,13 @@ public class MainMenuActivity extends WearableActivity {
             int resourceID = getResources().getIdentifier("home_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
             Log.d("home", item.currentTime.toString());
-            penTxt.setText(penTxt.getText().toString() + (item.yellowCard ? "YC " : "") + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
+            penTxt.setText(penTxt.getText().toString() + (item.yellowCard ? "YC " : "") + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
         for (Penalty item:awayPens) {
             int resourceID = getResources().getIdentifier("away_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
             Log.d("away", item.currentTime.toString());
-            penTxt.setText(penTxt.getText().toString() + String.format("%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC" : "") +"\n");
+            penTxt.setText(penTxt.getText().toString() + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC" : "") +"\n");
         }
     }
 

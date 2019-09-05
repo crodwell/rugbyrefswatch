@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,47 +8,46 @@
     android:keepScreenOn="true"
     android:padding="5dp"
     tools:context=".MainMenuActivity"
-    tools:deviceIds="wear">
+    tools:deviceIds="wear"
+    android:layout_gravity="bottom">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        app:boxedEdges="all">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
+            android:id="@+id/confirmMsg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/confirmMsg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Confirm Action"
-                android:textAlignment="center"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
+            android:layout_height="wrap_content"
+            android:text="@string/_startingNextPeriod"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:layout_above="@+id/circular_progress"
+            />
 
 
-            <android.support.wear.widget.CircularProgressLayout
-                android:id="@+id/circular_progress"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
-                android:padding="4dp"
-                app:backgroundColor="#8f8f8f"
-                app:colorSchemeColors="#000000"
-                app:strokeWidth="4dp">
+        <androidx.wear.widget.CircularProgressLayout
+            android:id="@+id/circular_progress"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:padding="4dp"
+            app:backgroundColor="#8f8f8f"
+            app:colorSchemeColors="#000000"
+            app:strokeWidth="4dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            >
 
-                <ImageView
-                    android:id="@+id/image_view"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@mipmap/cancel" />
-            </android.support.wear.widget.CircularProgressLayout>
-        </LinearLayout>
-
-
-    </FrameLayout>
-</android.support.wear.widget.BoxInsetLayout>
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@mipmap/cancel" />
+        </androidx.wear.widget.CircularProgressLayout>
+    </RelativeLayout>
+</androidx.wear.widget.BoxInsetLayout>

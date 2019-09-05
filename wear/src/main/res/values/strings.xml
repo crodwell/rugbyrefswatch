@@ -5,7 +5,7 @@
     <string name="_home">Home</string>
     <string name="_away">Away</string>
     <string name="_nextPeriod">Next Period</string>
-    <string name="_startingNextPeriod">Starting Next Period</string>
+    <string name="_startingNextPeriod">Starting\nNext Period</string>
     <string name="_restartMatch">Restart Match</string>
     <string name="_restartingMatch">Restarting Match</string>
     <string name="_quitApp">Quit</string>
@@ -16,4 +16,7 @@
     <string name="_secondHalf">2nd Half</string>
     <string name="_extraTime1">Extra Time 1</string>
     <string name="_extraTime2">Extra Time 2</string>
+    <string name="_initClockText">1st Half (40 mins)</string>
+    <string name="_yellow_card_filler_text">Yellow Card\nStarting For\n15</string>
+    <string name="_red_card_filler_text">Red Card For\n15</string>
 </resources>

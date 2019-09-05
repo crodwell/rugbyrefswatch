@@ -1,8 +1,8 @@
 package com.refrugby.watch;
 
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.wear.widget.CircularProgressLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.wear.widget.CircularProgressLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,7 +39,7 @@ public class YellowCardActivity extends WearableActivity {
                     if (item.equals(player)){
                         setContentView(R.layout.confirm_rc);
                         TextView txt = findViewById(R.id.confirmMsg);
-                        txt.setText("2nd Yellow = Red For\n" + player);
+                        txt.setText("2nd Yellow\n = Red For\n" + player);
                         CircularProgressLayout mCircularProgress = findViewById(R.id.circular_progress);
                         mCircularProgress.setOnTimerFinishedListener(new  CircularProgressLayout.OnTimerFinishedListener(){
                             @Override
@@ -63,7 +63,7 @@ public class YellowCardActivity extends WearableActivity {
 
                 setContentView(R.layout.confirm_yc);
                 TextView txt = findViewById(R.id.confirmMsg);
-                txt.setText("Yellow Card Starting For\n" + player);
+                txt.setText("Yellow Card\nStarting For\n" + player);
                 CircularProgressLayout mCircularProgress = findViewById(R.id.circular_progress);
                 mCircularProgress.setOnTimerFinishedListener(new  CircularProgressLayout.OnTimerFinishedListener(){
                     @Override

@@ -9,11 +9,11 @@ android {
             keyPassword "refwatch"
         }
     }
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId 'com.refrugby.watch'
         minSdkVersion 25
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 108
         versionName "1.0.8"
         signingConfig signingConfigs.signing_key
@@ -31,13 +31,14 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.google.android.support:wearable:2.3.0'
-    implementation 'com.google.android.gms:play-services-wearable:15.0.1'
-    implementation 'com.android.support:percent:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:wear:27.1.1'
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.google.android.support:wearable:2.5.0'
+    implementation 'com.google.android.gms:play-services-wearable:17.0.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.wear:wear:1.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'org.apache.commons:commons-lang3:3.6'
-    compileOnly 'com.google.android.wearable:wearable:2.3.0'
+    compileOnly 'com.google.android.wearable:wearable:2.5.0'
 }

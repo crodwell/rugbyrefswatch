@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,19 +8,23 @@
     android:padding="@dimen/box_inset_layout_padding"
     android:keepScreenOn="true"
     tools:context=".MainActivity"
-    tools:deviceIds="wear">
+    tools:deviceIds="wear"
+    android:id="@+id/mainLayout">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="-5px">
+        android:layout_marginTop="-5px"
+        >
 
         <Button
             android:id="@+id/match_clock"
             android:layout_width="198dp"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:layout_marginTop="4dp"
+            android:paddingTop="5dp"
             android:background="@android:color/background_light"
+            android:focusable="true"
             android:longClickable="true"
             android:onClick="matchTimer"
             android:text="@string/_startTime"
@@ -31,7 +35,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:orientation="horizontal"
             android:id="@+id/time_and_info"
             android:layout_width="match_parent"
@@ -42,8 +46,8 @@
             android:background="@android:drawable/bottom_bar"
             >
             <TextClock
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="15dp"
                 android:id="@+id/textClock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,9 +57,24 @@
                 android:id="@+id/info_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1st Half (40 mins)"
+                android:text="@string/_initClockText"
                 android:textSize="14sp"
             />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/penalty_history"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/time_and_info"
+            android:background="@color/dark_grey"
+            android:layout_marginStart="8dp"
+            >
+
+            <!-- TextViews are added on penalty change -->
+
         </LinearLayout>
 
 
@@ -71,9 +90,9 @@
             android:onClick="homeYC"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_and_info">
+            app:layout_constraintTop_toBottomOf="@+id/penalty_history">
 
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -103,7 +122,7 @@
             android:onClick="menu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_and_info" />
+            app:layout_constraintTop_toBottomOf="@+id/penalty_history" />
 
 
         <FrameLayout
@@ -118,9 +137,9 @@
             android:onClick="awayYC"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_and_info">
+            app:layout_constraintTop_toBottomOf="@+id/penalty_history">
 
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -143,7 +162,7 @@
             </LinearLayout>
         </FrameLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -154,6 +173,7 @@
 
             <Button
                 android:id="@+id/home_pen"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_weight="1"
@@ -165,8 +185,7 @@
                 android:text="@string/_0"
                 android:textAlignment="center"
                 android:textSize="30sp"
-                android:visibility="visible"
-                style="?android:attr/borderlessButtonStyle" />
+                android:visibility="visible" />
 
             <Button
                 android:id="@+id/away_pen"
@@ -189,6 +208,6 @@
 
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</android.support.wear.widget.BoxInsetLayout>
+</androidx.wear.widget.BoxInsetLayout>

@@ -3,7 +3,7 @@ package com.refrugby.watch;
 import android.view.View;
 import android.widget.TextView;
 import android.view.ViewGroup;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Gravity;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SimpleViewHolder> {
