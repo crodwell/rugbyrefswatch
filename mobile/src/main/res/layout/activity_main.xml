@@ -6,9 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
@@ -18,62 +16,72 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
+            <com.refrugby.watch.TopCropImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/black"
+                android:layout_weight="0"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/wearscreenshot" />
+                android:src="@drawable/scrum" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_weight="0"
+                android:background="#000000" />
 
             <TextView
                 android:id="@+id/intro_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:autoLink="web"
                 android:background="@android:color/white"
-                android:scrollbarAlwaysDrawVerticalTrack="true"
-                android:fadeScrollbars="false"
-                android:scrollbars="vertical"
                 android:text="@string/intro_text"
+                android:fadeScrollbars="false"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbars="vertical"
                 android:textColor="@android:color/black" />
             <View
+                android:id="@+id/bottom_border"
                 android:layout_width="match_parent"
+                android:layout_weight="0"
                 android:layout_height="1dp"
                 android:background="#000000" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
+                android:layout_weight="0"
                 android:text="@string/status"
-                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
                 />
             <TextView
                 android:id="@+id/information_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginLeft="15dp"
+                android:layout_weight="0"
+                android:layout_marginStart="15dp"
                 android:textStyle="italic"
                 android:textColor="#a3101a"
                 />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_weight="0"
                 android:background="#000000" />
             <LinearLayout
+                android:layout_weight="0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center">
                 <Button
                     android:id="@+id/start_button"
+                    style="@style/Widget.AppCompat.Button.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="showSettings"
@@ -82,11 +90,13 @@
                     android:visibility="gone"/>
                 <Button
                     android:id="@+id/remote_open_button"
-                    android:text="Install"
+                    style="@style/Widget.AppCompat.Button.Small"
+                    android:text="@string/install"
                     android:layout_width="100dp"
                     android:layout_height="50dp" />
                 <Button
                     android:id="@+id/rate"
+                    style="@style/Widget.AppCompat.Button.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="rateOnAppStore"

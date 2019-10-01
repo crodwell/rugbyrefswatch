@@ -273,7 +273,7 @@ public class MainActivity extends WearableActivity {
                 drawablePen.setTextColor(Color.parseColor(teamTextColours.get(teamColourList[awayColourCode])));
             }
             drawablePen.setWidth(30);
-            drawablePen.setTextSize(10);
+            drawablePen.setTextSize(12);
             drawablePen.setGravity(Gravity.CENTER);
             drawablePen.setText(String.format(Locale.getDefault(), "%d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime)));
 

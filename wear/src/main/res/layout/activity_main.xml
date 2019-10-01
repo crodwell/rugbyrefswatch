@@ -61,17 +61,18 @@
                 android:textSize="14sp"
             />
         </LinearLayout>
+
         <LinearLayout
-            android:orientation="horizontal"
             android:id="@+id/penalty_history"
             android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:layout_marginTop="1dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_and_info"
-            android:background="@color/dark_grey"
+            android:layout_height="12dp"
             android:layout_marginStart="8dp"
-            >
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="1dp"
+            android:background="@color/dark_grey"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/time_and_info">
 
             <!-- TextViews are added on penalty change -->
 
@@ -181,7 +182,7 @@
                 android:gravity="top"
                 android:onClick="homePen"
                 android:paddingLeft="20dp"
-                android:paddingTop="15dp"
+                android:paddingTop="13dp"
                 android:text="@string/_0"
                 android:textAlignment="center"
                 android:textSize="30sp"
@@ -189,20 +190,20 @@
 
             <Button
                 android:id="@+id/away_pen"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_weight="1"
                 android:background="@android:color/black"
                 android:gravity="top"
                 android:onClick="awayPen"
+                android:paddingTop="13dp"
                 android:paddingRight="20dp"
-                android:paddingTop="15dp"
                 android:text="@string/_0"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="30sp"
-                android:visibility="visible"
-                style="?android:attr/borderlessButtonStyle"/>
+                android:visibility="visible" />
         </LinearLayout>
 
 

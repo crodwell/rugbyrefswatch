@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -34,8 +36,8 @@ import com.google.android.wearable.intent.RemoteIntent;
 public class MainActivity extends AppCompatActivity implements CapabilityClient.OnCapabilityChangedListener {
     private static final String TAG = "MainMobileActivity";
     private static final String CHECKING_MESSAGE = "Checking for Rugby Referee Watch on smart watch...\n";
-    private static final String NO_DEVICES = "You have no Wear devices linked to your phone. Please pair a Wear 2.0 or greater smart watch before using this app.\n";
-    private static final String MISSING_ALL_MESSAGE = "Cannot detect Rugby Referee Watch on a connected smart watch, please click install to attempt installation.\n";
+    private static final String NO_DEVICES = "No devices linked to your phone. Please pair an Android Wear OS 2.0 smart watch before using this app.\n";
+    private static final String MISSING_ALL_MESSAGE = "Cannot detect Rugby Referee Watch on a connected smart watch, click install to attempt installation.\n";
 //    private static final String INSTALLED_SOME_DEVICES_MESSAGE = "Rugby Ref Watch is installed on your smart watch.\n";
     private static final String INSTALLED_ALL_DEVICES_MESSAGE = "Rugby Referee Watch is installed on your smart watch.\n";
     private static final String CAPABILITY_WEAR_APP = "wear_rugby_ref_watch";
@@ -90,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
                 openPlayStoreOnWearDevicesWithoutApp();
             }
         });
+
+        TextView introTextView = findViewById(R.id.intro_text);
+        introTextView.setMovementMethod(new ScrollingMovementMethod());
+
     }
 
     @Override
@@ -225,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements CapabilityClient.
 
         // Create a List of Nodes (Wear devices) without your app.
         ArrayList<Node> nodesWithoutApp = new ArrayList<>();
+        if (mAllConnectedNodes == null || mAllConnectedNodes.isEmpty()){
+            return;
+        }
 
         for (Node node : mAllConnectedNodes) {
             if (!mWearNodesWithApp.contains(node)) {
