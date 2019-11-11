@@ -1,5 +1,6 @@
 package com.refrugby.watch;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.wearable.activity.WearableActivity;
@@ -34,22 +35,25 @@ import android.widget.LinearLayout;
 import android.media.MediaPlayer;
 import org.apache.commons.lang3.StringUtils;
 
+import static android.content.Context.VIBRATOR_SERVICE;
+
 
 public class MainActivity extends WearableActivity {
 
     private int matchTimerState;  // 0 = Initial, 1 = Running, 2 = Paused
+    private boolean countdownMatchClock;
     private CountDownTimer matchTimer;
     private CountDownTimer matchPauseTimer;
     private long currentMatchTime;
 
     private int currentPeriod = 0;
-    private boolean u19 = false;
+    private boolean u18 = false;
     private String[] periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
     private long[] periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
     private long yellowCardLength = (10 * 60000L);
     // for testing
-    // private long[] periodLengths = new long[]{*(1 *60000), (1*60000), (0.5 * 60000), (0.5 * 50000)};
-    // private long yellowCardLength = (1 * 60000L);
+//     private long[] periodLengths = new long[]{30000L, 30000L, 15000L, 15000L};
+//     private long yellowCardLength = 30000L;
 
     private String[] teamColourList = new String[]{"Blue", "White", "Red", "Black", "Gold", "Green", "Purple", "Silver"};
 
@@ -103,6 +107,12 @@ public class MainActivity extends WearableActivity {
         setAmbientEnabled(); // Enables Always-on
         setContentView(R.layout.activity_main);
 
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        u18 = sharedPref.getBoolean("u18", false);
+        setU18Mode(u18);
+        countdownMatchClock = sharedPref.getBoolean("countdownMatchClock", false);
+        restartMatch();
+
         Button homePen = findViewById(R.id.home_pen);
         homePen.setOnLongClickListener(new OnLongClickListener() {
             @Override
@@ -148,6 +158,7 @@ public class MainActivity extends WearableActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                setU18Mode(false);
                 String serialisedSettings = intent.getExtras().get("message").toString();
                 String halfLength = StringUtils.substringBetween(serialisedSettings, "half_length:", "|");
                 String extraTimeLength = StringUtils.substringBetween(serialisedSettings, "extra_time_length:", "|");
@@ -156,15 +167,25 @@ public class MainActivity extends WearableActivity {
                 String awayColour = StringUtils.substringBetween(serialisedSettings, "away_colour:", "|");
                 periodLengths = new long[]{Long.parseLong(halfLength) * 60000, Long.parseLong(halfLength) * 60000, Long.parseLong(extraTimeLength) * 60000, Long.parseLong(extraTimeLength) * 60000};
                 yellowCardLength = Long.parseLong(ycLength) * 60000;
-                Log.d("hex", teamBgColours.get(homeColour));
-                Log.d("int", Integer.toString(Color.parseColor(teamBgColours.get(homeColour))));
-                Log.d("hex", awayColour);
-                Button home_pen = findViewById(R.id.home_pen);
-                Button away_pen = findViewById(R.id.away_pen);
-                home_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(homeColour)));
-                home_pen.setTextColor(Color.parseColor(teamTextColours.get(homeColour)));
-                away_pen.setBackgroundColor(Color.parseColor(teamBgColours.get(awayColour)));
-                away_pen.setTextColor(Color.parseColor(teamTextColours.get(awayColour)));
+//                Log.d("hex", teamBgColours.get(homeColour));
+//                Log.d("int", Integer.toString(Color.parseColor(teamBgColours.get(homeColour))));
+//                Log.d("hex", awayColour);
+
+                // hack to get the colour index from phone message
+                Integer i = 0;
+                while (i < teamColourList.length) {
+
+                    if (homeColour.equals(teamColourList[i])){
+                        homeColourCode = i;
+                    }
+                    if (awayColour.equals(teamColourList[i])){
+                        awayColourCode = i;
+                    }
+                    i++;
+                }
+
+                drawTeamColour(R.id.home_pen, homeColourCode);
+                drawTeamColour(R.id.away_pen, awayColourCode);
 
                 restartMatch();
             }  catch (NullPointerException exception) {
@@ -175,6 +196,11 @@ public class MainActivity extends WearableActivity {
         }
     }
 
+    public void drawTeamColour(Integer targetViewId, Integer colourCode){
+        findViewById(targetViewId).setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[colourCode])));
+        ((TextView)findViewById(targetViewId)).setTextColor(Color.parseColor(teamTextColours.get(teamColourList[colourCode])));
+    }
+
     public void homePen(View v) {
         // if match hasn't started yet, change colour
         if (currentMatchTime == 0 && currentPeriod == 0){
@@ -183,8 +209,7 @@ public class MainActivity extends WearableActivity {
             } else {
                 homeColourCode++;
             }
-            findViewById(R.id.home_pen).setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[homeColourCode])));
-            ((TextView)findViewById(R.id.home_pen)).setTextColor(Color.parseColor(teamTextColours.get(teamColourList[homeColourCode])));
+            drawTeamColour(R.id.home_pen, homeColourCode);
             return;
         }
 
@@ -208,8 +233,7 @@ public class MainActivity extends WearableActivity {
             } else {
                 awayColourCode++;
             }
-            findViewById(R.id.away_pen).setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[awayColourCode])));
-            ((TextView)findViewById(R.id.away_pen)).setTextColor(Color.parseColor(teamTextColours.get(teamColourList[awayColourCode])));
+            drawTeamColour(R.id.away_pen, awayColourCode);
             return;
         }
 
@@ -341,12 +365,26 @@ public class MainActivity extends WearableActivity {
     public void menu(View v){
         Intent menu = new Intent(getApplicationContext(), MainMenuActivity.class);
         menu.putExtra("currentMatchTime", currentMatchTime);
-        menu.putExtra("u19", u19);
+        menu.putExtra("u18", u18);
+        menu.putExtra("countdownMatchClock", countdownMatchClock);
         menu.putExtra("finalPeriod", (currentPeriod == periodLengths.length -1));
         menu.putExtra("currentPeriod", currentPeriod);
         menu.putParcelableArrayListExtra("homePens", homePens);
         menu.putParcelableArrayListExtra("awayPens", awayPens);
         startActivityForResult(menu, MAIN_MENU);
+    }
+
+
+    public void drawInitialMatchClock() {
+        TextView matchClock = findViewById(R.id.match_clock);
+        if (countdownMatchClock) {
+            matchClock.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(periodLengths[currentPeriod]),
+                    TimeUnit.MILLISECONDS.toSeconds(periodLengths[currentPeriod]) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(periodLengths[currentPeriod]))));
+        } else {
+            matchClock.setText("0:00");
+        }
+        matchClock.setBackgroundColor(Color.WHITE);
+        matchClock.setTextColor(Color.BLACK);
     }
 
     @Override
@@ -385,16 +423,8 @@ public class MainActivity extends WearableActivity {
                     final TextView infoBar = findViewById(R.id.info_bar);
                     infoBar.setText(periodLabels[currentPeriod] + " (" + Long.toString(periodLengths[currentPeriod] / 60000) + " mins)");
 
-                    for (YellowCard item:homeYCs) {
-                        item.pauseTimer();
-                    }
-                    for (YellowCard item:awayYCs) {
-                        item.pauseTimer();
-                    }
-                    TextView matchClock = findViewById(R.id.match_clock);
-                    matchClock.setText("0:00");
-                    matchClock.setBackgroundColor(Color.WHITE);
-                    matchClock.setTextColor(Color.BLACK);
+                    pauseYellowCardTimers();
+                    drawInitialMatchClock();
                     if (matchTimerState > 0) {
                         matchTimer.cancel();
                     }
@@ -410,16 +440,22 @@ public class MainActivity extends WearableActivity {
                     restartMatch();
                 }
 
-                if (action.equals("u19")){
-                    if (!u19){
-                        u19 = true;
-                        periodLengths = new long[]{(35 * 60000), (35 * 60000), (10 * 60000), (10 * 60000)};
-                        yellowCardLength = (7 * 60000L);
-                    } else {
-                        u19 = false;
-                        periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
-                        yellowCardLength = (10 * 60000L);
-                    }
+                if (action.equals("u18")){
+                    u18 = !u18;
+                    SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("u18", u18);
+                    editor.apply();
+                    setU18Mode(u18);
+                    restartMatch();
+                }
+
+                if (action.equals("countdownMatchClock")){
+                    countdownMatchClock = !countdownMatchClock;
+                    SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("countdownMatchClock", countdownMatchClock);
+                    editor.apply();
                     restartMatch();
                 }
             }
@@ -427,17 +463,30 @@ public class MainActivity extends WearableActivity {
 
     }
 
+    public void setU18Mode(boolean enabled){
+        if (enabled){
+            periodLabels = new String[]{"1st Half", "2nd Half"};
+            periodLengths = new long[]{(35 * 60000), (35 * 60000)};
+            yellowCardLength = (7 * 60000L);
+        } else {
+            periodLabels = new String[]{"1st Half", "2nd Half", "Extra Time 1", "Extra Time 2"};
+            periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
+            yellowCardLength = (10 * 60000L);
+        }
+    }
+
     public void matchTimer(View v) {
         switch (matchTimerState) {
-            case 1: // Pause Timers
+            case 1: // If 1 (running) then pause timers
                 matchTimer.cancel();
                 pauseYellowCardTimers();
                 matchTimerState = 2;
 
-                matchPauseTimer = new CountDownTimer(300000, 20000) { // vibrate every 20 seconds for 5 mins while match is paused
+                // vibrate every 20 seconds for up to 5 minutes to remind us match is paused
+                matchPauseTimer = new CountDownTimer(300000, 20000) {
                     public void onTick(long millisUntilFinished) {
                         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                        long[] vibrationPattern = {0, 500, 50, 300};
+                        long[] vibrationPattern = {0, 500, 50, 300}; // {delay, vibrate, sleep, vibrate, sleep...
                         //-1 - don't repeat
                         final int indexInPatternToRepeat = -1;
                         vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
@@ -448,7 +497,7 @@ public class MainActivity extends WearableActivity {
                 }.start();
                 break;
 
-            case 2:  // Restart Timers
+            case 2: // If 2 (Paused) then restart timers
                 startMatchClock(currentMatchTime);
                 matchTimerState = 1;
                 matchPauseTimer.cancel();
@@ -507,10 +556,7 @@ public class MainActivity extends WearableActivity {
         drawPenaltyHistory();
 
         printYcStatus();
-        TextView matchClock = findViewById(R.id.match_clock);
-        matchClock.setText("0:00");
-        matchClock.setBackgroundColor(Color.WHITE);
-        matchClock.setTextColor(Color.BLACK);
+        drawInitialMatchClock();
         halfTimeHooter = false;
         matchTimerState = 0;
         currentPeriod = 0;
@@ -522,18 +568,26 @@ public class MainActivity extends WearableActivity {
 
     }
 
-    private void startMatchClock(long millisInFuture){
+    private void startMatchClock(final long millisInFuture){
         final TextView txt = findViewById(R.id.match_clock);
 
-        final long bigLong = 20000000; // stupidly high limit we will never reach. Let's us run Countdown as Countup. (I didn't like Chronometer package)
+        final long bigLong = 20000000; // stupidly high limit we will never reach. Let's us run Countdown as Count up. (I didn't like Chronometer package)
         final long startTime = bigLong - millisInFuture;
+
 
         matchTimer = new CountDownTimer(startTime, 1000) {
             public void onTick(long millisUntilFinished) {
 
                 currentMatchTime = bigLong - millisUntilFinished;
-                txt.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
-                        TimeUnit.MILLISECONDS.toSeconds(currentMatchTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentMatchTime))));
+
+                if (!countdownMatchClock) {
+                    txt.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(currentMatchTime),
+                            TimeUnit.MILLISECONDS.toSeconds(currentMatchTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currentMatchTime))));
+                } else {
+                    Long countDownTime = Math.abs(periodLengths[currentPeriod] - currentMatchTime);
+                    txt.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(countDownTime),
+                            TimeUnit.MILLISECONDS.toSeconds(countDownTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(countDownTime))));
+                }
                 if (currentMatchTime > periodLengths[currentPeriod] && !halfTimeHooter) {
                     txt.setBackgroundColor(Color.RED);
                     txt.setTextColor(Color.WHITE);
@@ -541,6 +595,12 @@ public class MainActivity extends WearableActivity {
                     mediaPlayer.setVolume(1.0F, 1.0F);
                     mediaPlayer.start();
                     halfTimeHooter = true;
+                    // Vibrate as well for watches that don't have speakers:
+                    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    long[] vibrationPattern = {0, 3000}; // {delay, vibrate, sleep, vibrate, sleep...
+                    //-1 - don't repeat
+                    final int indexInPatternToRepeat = -1;
+                    vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
                 }
                 printYcStatus();
             }
@@ -643,11 +703,14 @@ class YellowCard {
         this.context = context;
         this.player = player;
         this.yellowCardLength = yellowCardLength;
-        createTimer();
+        newYC();
+    }
+    private void newYC(){
+        this.createTimer(yellowCardLength);
     }
 
-    private void createTimer() {
-        ycTimer = new CountDownTimer(yellowCardLength, 1000) { // adjust the milli seconds here
+    private void createTimer(Long duration) {
+        ycTimer = new CountDownTimer(duration, 1000) { // adjust the milli seconds here
             public void onTick(long millisUntilFinished) {
                 currentTime = millisUntilFinished;
             }
@@ -657,13 +720,18 @@ class YellowCard {
                 mediaPlayer.setVolume(1.0F, 1.0F);
                 mediaPlayer.start();
                 expired = true;
+
+                // vibrate as well for watches that don't have speakers
+                Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
+                long[] vibrationPattern = {0, 1000, 500, 1000}; // {delay, vibrate, sleep, vibrate, sleep...
+                final int indexInPatternToRepeat = -1; //-1 - don't repeat
+                vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+
             }
         }.start();
     }
 
     public void pauseTimer() {
-    Log.d("TAG", "Paused YC timer");
-
         ycTimer.cancel();
     }
 
@@ -673,18 +741,7 @@ class YellowCard {
     }
 
     public void restartTimer() {
-        ycTimer = new CountDownTimer(currentTime, 1000) { // adjust the milli seconds here
-            public void onTick(long millisUntilFinished) {
-                currentTime = millisUntilFinished;
-            }
-
-            public void onFinish() {
-                mediaPlayer = MediaPlayer.create(context.getApplicationContext(), R.raw.alarm);
-                mediaPlayer.setVolume(1.0F, 1.0F);
-                mediaPlayer.start();
-                expired = true;
-            }
-        }.start();
+        createTimer(currentTime);
     }
 }
 

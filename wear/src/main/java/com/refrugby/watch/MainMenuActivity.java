@@ -22,7 +22,8 @@ public class MainMenuActivity extends WearableActivity {
 
     private Integer currentPeriod;
     private Long currentMatchTime;
-    private boolean u19;
+    private boolean u18;
+    public boolean countdownMatchClock;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,8 @@ public class MainMenuActivity extends WearableActivity {
         Intent i = getIntent();
         currentPeriod = i.getIntExtra("currentPeriod", 0);
         currentMatchTime = i.getLongExtra("currentMatchTime", 0);
-        u19 = i.getBooleanExtra("u19", false);
+        u18 = i.getBooleanExtra("u18", false);
+        countdownMatchClock = i.getBooleanExtra("countdownMatchClock", false);
         WearableRecyclerView recyclerView = findViewById(R.id.main_menu_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setEdgeItemsCenteringEnabled(true);
@@ -45,10 +47,18 @@ public class MainMenuActivity extends WearableActivity {
         }
         menuItems.add(new MenuItem("matchSummary", R.drawable.summary_icon,"Match Summary"));
         if (currentPeriod == 0 && currentMatchTime == 0){
-            if (!u19){
-                menuItems.add(new MenuItem("switchU19", R.drawable.next_period_icon,"U19 Match Time"));
+            if (!u18){
+                menuItems.add(new MenuItem("switchU18", R.drawable.next_period_icon,"U18 Time (RFU)"));
             } else {
-                menuItems.add(new MenuItem("switchU19", R.drawable.next_period_icon,"Adult Match Time"));
+                menuItems.add(new MenuItem("switchU18", R.drawable.next_period_icon,"Adult Match Time"));
+            }
+        }
+
+        if (currentPeriod == 0 && currentMatchTime == 0){
+            if (!countdownMatchClock){
+                menuItems.add(new MenuItem("switchCountdownMatchClock", R.drawable.next_period_icon,"Count Down Mode"));
+            } else {
+                menuItems.add(new MenuItem("switchCountdownMatchClock", R.drawable.next_period_icon,"Count Up Mode"));
             }
         }
 
@@ -61,7 +71,8 @@ public class MainMenuActivity extends WearableActivity {
                 switch (menuId){
                     case "nextPeriod":  nextPeriod(); break;
                     case "matchSummary":  showSummary(); break;
-                    case "switchU19":  switchU19(); break;
+                    case "switchU18":  switchU18(); break;
+                    case "switchCountdownMatchClock":  switchCountDownMatchClock(); break;
                     case "restartMatch":  restartMatch(); break;
                     case "quitApp":  quitApp(); break;
                     default : cancelMenu();
@@ -80,9 +91,16 @@ public class MainMenuActivity extends WearableActivity {
         finish();
     }
 
-    public void switchU19(){
+    public void switchU18(){
         Intent i = new Intent();
-        i.putExtra("action","u19");
+        i.putExtra("action","u18");
+        setResult(RESULT_OK,i);
+        finish();
+    }
+
+    public void switchCountDownMatchClock(){
+        Intent i = new Intent();
+        i.putExtra("action","countdownMatchClock");
         setResult(RESULT_OK,i);
         finish();
     }
