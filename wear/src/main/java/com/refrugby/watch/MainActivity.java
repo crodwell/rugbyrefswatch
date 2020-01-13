@@ -1,6 +1,12 @@
 package com.refrugby.watch;
 
+import android.Manifest;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.wearable.activity.WearableActivity;
@@ -14,12 +20,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.content.Context;
 import android.os.CountDownTimer;
@@ -30,6 +40,12 @@ import android.util.Log;
 import android.os.Parcel;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 
 import android.media.MediaPlayer;
@@ -39,6 +55,14 @@ import static android.content.Context.VIBRATOR_SERVICE;
 
 
 public class MainActivity extends WearableActivity {
+
+    private boolean deviceHasSpeaker;
+    private boolean deviceHasGps;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location lastKnownLocation;
+    private Float metersTravelled = 0.0F;
+
 
     private int matchTimerState;  // 0 = Initial, 1 = Running, 2 = Paused
     private boolean countdownMatchClock;
@@ -52,8 +76,7 @@ public class MainActivity extends WearableActivity {
     private long[] periodLengths = new long[]{(40 * 60000), (40 * 60000), (10 *60000), (10 * 60000)};
     private long yellowCardLength = (10 * 60000L);
     // for testing
-//     private long[] periodLengths = new long[]{30000L, 30000L, 15000L, 15000L};
-//     private long yellowCardLength = 30000L;
+    private boolean debug = false;
 
     private String[] teamColourList = new String[]{"Blue", "White", "Red", "Black", "Gold", "Green", "Purple", "Silver"};
 
@@ -107,10 +130,22 @@ public class MainActivity extends WearableActivity {
         setAmbientEnabled(); // Enables Always-on
         setContentView(R.layout.activity_main);
 
+        checkDeviceHardware();
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        Log.d("deviceHasSpeaker", Boolean.toString(deviceHasSpeaker));
+        Log.d("deviceHasGps", Boolean.toString(deviceHasGps));
+
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         u18 = sharedPref.getBoolean("u18", false);
         setU18Mode(u18);
         countdownMatchClock = sharedPref.getBoolean("countdownMatchClock", false);
+        if (debug) {
+            periodLengths = new long[]{60000L, 60000L, 30000L, 30000L};
+            yellowCardLength = 30000L;
+        }
+
         restartMatch();
 
         Button homePen = findViewById(R.id.home_pen);
@@ -167,9 +202,6 @@ public class MainActivity extends WearableActivity {
                 String awayColour = StringUtils.substringBetween(serialisedSettings, "away_colour:", "|");
                 periodLengths = new long[]{Long.parseLong(halfLength) * 60000, Long.parseLong(halfLength) * 60000, Long.parseLong(extraTimeLength) * 60000, Long.parseLong(extraTimeLength) * 60000};
                 yellowCardLength = Long.parseLong(ycLength) * 60000;
-//                Log.d("hex", teamBgColours.get(homeColour));
-//                Log.d("int", Integer.toString(Color.parseColor(teamBgColours.get(homeColour))));
-//                Log.d("hex", awayColour);
 
                 // hack to get the colour index from phone message
                 Integer i = 0;
@@ -220,7 +252,8 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        homePens.add(new Penalty(currentMatchTime, currentPeriod, false, "home"));
+
+        homePens.add(new Penalty(currentMatchTime, currentPeriod, false, "home", lastKnownLocation));
         ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
         drawPenaltyHistory();
     }
@@ -244,7 +277,7 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false, "away"));
+        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false, "away", lastKnownLocation));
         ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
         drawPenaltyHistory();
     }
@@ -276,17 +309,19 @@ public class MainActivity extends WearableActivity {
         LinearLayout linearLayout = findViewById(R.id.penalty_history);
         linearLayout.removeAllViews();
         int i = 0;
+        int penaltyWidth = 40;
+
         for (Penalty item:allPens) {
             i++;
             TextView drawablePen = new TextView(this);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-            if (linearLayout.getWidth() < (31 * i)){ // if too big for screen, don't print any more.
+            if (linearLayout.getWidth() < ((penaltyWidth + 1) * i)){ // if too big for screen, don't print any more.
                 break;
             }
 
 
-            params.setMargins(0,-5, 1, 0);
+            params.setMargins(0,-6, 1, 0);
             params.height = LinearLayout.LayoutParams.MATCH_PARENT;
             drawablePen.setLayoutParams(params);
             if (item.side == "home") {
@@ -296,8 +331,8 @@ public class MainActivity extends WearableActivity {
                 drawablePen.setBackgroundColor(Color.parseColor(teamBgColours.get(teamColourList[awayColourCode])));
                 drawablePen.setTextColor(Color.parseColor(teamTextColours.get(teamColourList[awayColourCode])));
             }
-            drawablePen.setWidth(30);
-            drawablePen.setTextSize(12);
+            drawablePen.setWidth(penaltyWidth);
+            drawablePen.setTextSize(16);
             drawablePen.setGravity(Gravity.CENTER);
             drawablePen.setText(String.format(Locale.getDefault(), "%d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime)));
 
@@ -364,6 +399,7 @@ public class MainActivity extends WearableActivity {
 
     public void menu(View v){
         Intent menu = new Intent(getApplicationContext(), MainMenuActivity.class);
+        menu.putExtra("metersTravelled", metersTravelled);
         menu.putExtra("currentMatchTime", currentMatchTime);
         menu.putExtra("u18", u18);
         menu.putExtra("countdownMatchClock", countdownMatchClock);
@@ -396,15 +432,16 @@ public class MainActivity extends WearableActivity {
                 // The user picked a player.
                 String player = data.getExtras().get("player").toString();
                 String side = data.getExtras().get("side").toString();
+
                 if (side.equals("home")){
-                    homeYCs.add(new YellowCard(this, player, yellowCardLength));
+                    homeYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
                     activeHomeYCs++;
-                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true, "home"));
+                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true, "home", lastKnownLocation));
                     ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
                 } else {
-                    awayYCs.add(new YellowCard(this, player, yellowCardLength));
+                    awayYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
                     activeAwayYCs++;
-                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true, "away"));
+                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true, "away", lastKnownLocation));
                     ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
                 }
                 drawPenaltyHistory();
@@ -418,6 +455,7 @@ public class MainActivity extends WearableActivity {
                     restartMatch(); // clears timers so they don't carry on after quit
                     finishAndRemoveTask();
                 }
+
                 if (action.equals("period")){
                     currentPeriod++;
                     final TextView infoBar = findViewById(R.id.info_bar);
@@ -436,6 +474,7 @@ public class MainActivity extends WearableActivity {
                     currentMatchTime = 0L;
 
                 }
+
                 if (action.equals("restart")){
                     restartMatch();
                 }
@@ -478,8 +517,8 @@ public class MainActivity extends WearableActivity {
     public void matchTimer(View v) {
         switch (matchTimerState) {
             case 1: // If 1 (running) then pause timers
-                matchTimer.cancel();
                 pauseYellowCardTimers();
+                matchTimer.cancel();
                 matchTimerState = 2;
 
                 // vibrate every 20 seconds for up to 5 minutes to remind us match is paused
@@ -490,11 +529,13 @@ public class MainActivity extends WearableActivity {
                         //-1 - don't repeat
                         final int indexInPatternToRepeat = -1;
                         vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+                        printYcStatus();
                     }
 
                     public void onFinish() {
                     }
                 }.start();
+
                 break;
 
             case 2: // If 2 (Paused) then restart timers
@@ -543,6 +584,8 @@ public class MainActivity extends WearableActivity {
             matchPauseTimer.cancel();
         }
 
+        metersTravelled = 0.0F;
+
         pauseYellowCardTimers(); // we kill the timers and overwrite YC objects next
 
         homePens = new ArrayList<>();
@@ -573,7 +616,7 @@ public class MainActivity extends WearableActivity {
 
         final long bigLong = 20000000; // stupidly high limit we will never reach. Let's us run Countdown as Count up. (I didn't like Chronometer package)
         final long startTime = bigLong - millisInFuture;
-
+        startTrackLocation();
 
         matchTimer = new CountDownTimer(startTime, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -588,12 +631,15 @@ public class MainActivity extends WearableActivity {
                     txt.setText(String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(countDownTime),
                             TimeUnit.MILLISECONDS.toSeconds(countDownTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(countDownTime))));
                 }
+
                 if (currentMatchTime > periodLengths[currentPeriod] && !halfTimeHooter) {
                     txt.setBackgroundColor(Color.RED);
                     txt.setTextColor(Color.WHITE);
-                    MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.hooter);
-                    mediaPlayer.setVolume(1.0F, 1.0F);
-                    mediaPlayer.start();
+                    if (deviceHasSpeaker) {
+                        MediaPlayer mediaPlayer = MediaPlayer.create(getBaseContext(), R.raw.hooter);
+                        mediaPlayer.setVolume(1.0F, 1.0F);
+                        mediaPlayer.start();
+                    }
                     halfTimeHooter = true;
                     // Vibrate as well for watches that don't have speakers:
                     Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -602,7 +648,11 @@ public class MainActivity extends WearableActivity {
                     final int indexInPatternToRepeat = -1;
                     vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
                 }
+                yellowCardTickTimers();
                 printYcStatus();
+
+                trackDistanceByGps();
+
             }
 
             public void onFinish() {
@@ -610,14 +660,69 @@ public class MainActivity extends WearableActivity {
         }.start();
     }
 
+    private void startTrackLocation(){
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(3000);
+        mLocationRequest.setFastestInterval(3000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+//                for (Location location : locationResult.getLocations()) {
+//                    if (location != null) {
+//                        Log.d("gps2", location.toString());
+//                    }
+//                }
+            }
+        };
+        LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+    }
+
+    private void trackDistanceByGps(){
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                // Get last known location. In some rare situations this can be null.
+                if (location != null) {
+//                    Log.d("gps", location.toString());
+                    if (lastKnownLocation != null){
+                        if (lastKnownLocation.getLongitude() != 0 && lastKnownLocation.getLatitude() != 0){
+                            metersTravelled += location.distanceTo(lastKnownLocation);
+                        }
+                    }
+//                    Log.d("distance", Float.toString(metersTravelled));
+                    lastKnownLocation = location;
+                } else {
+                    Log.d("gps", "location is null");
+                }
+
+            }
+        });
+    }
+
+
+
+    private void yellowCardTickTimers(){
+        for (YellowCard item : homeYCs) {
+            item.decrementTimer();
+        }
+        for (YellowCard item : awayYCs) {
+            item.decrementTimer();
+        }
+    }
+
     private void printYcStatus(){
-        Integer homeYcTextview = 0;
-        Integer awayYcTextview = 0;
+        Integer homeYcTextView = 0;
+        Integer awayYcTextView = 0;
 
         if (homeYCs.size() > 0) {
             String homeYCText;
             for (int i = 0; i < homeYCs.size(); i++) {
-                int resourceID = getResources().getIdentifier("home_yc_" + Integer.toString(homeYcTextview), "id", getPackageName());
+
+                int resourceID = getResources().getIdentifier("home_yc_" + homeYcTextView, "id", getPackageName());
                 TextView homeYc = findViewById(resourceID);
                 if (homeYCs.get(i).acknowledged){
                     ((TextView)findViewById(R.id.home_yc_0)).setText("");
@@ -630,17 +735,16 @@ public class MainActivity extends WearableActivity {
                 } else {
                     homeYc.setTextColor(Color.BLACK);
                 }
-                if (homeYcTextview == 1 && activeHomeYCs > 2) {
-                    homeYCText = "+" + Integer.toString(activeHomeYCs - 1);
+                if (homeYcTextView == 1 && activeHomeYCs > 2) {
+                    homeYCText = "+" + (activeHomeYCs - 1);
                     homeYc.setTextColor(Color.BLACK);
                     homeYc.setText(homeYCText);
                 }
 
-                if (homeYcTextview < 1 || activeHomeYCs == 2) {
-                    homeYCText = homeYCs.get(i).player + " " + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime),
-                            TimeUnit.MILLISECONDS.toSeconds(homeYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(homeYCs.get(i).currentTime))) + "\n";
+                if (homeYcTextView < 1 || activeHomeYCs == 2) {
+                    homeYCText = homeYCs.get(i).getText();
                     homeYc.setText(homeYCText);
-                    homeYcTextview++;
+                    homeYcTextView++;
                 }
 
             }
@@ -652,7 +756,8 @@ public class MainActivity extends WearableActivity {
         if (awayYCs.size() > 0) {
             String awayYCText;
             for (int i = 0; i < awayYCs.size(); i++) {
-                int resourceID = getResources().getIdentifier("away_yc_" + Integer.toString(awayYcTextview), "id", getPackageName());
+
+                int resourceID = getResources().getIdentifier("away_yc_" + (awayYcTextView), "id", getPackageName());
                 TextView awayYc = findViewById(resourceID);
 
                 if (awayYCs.get(i).acknowledged){
@@ -667,17 +772,16 @@ public class MainActivity extends WearableActivity {
                     awayYc.setTextColor(Color.BLACK);
                 }
 
-                if (awayYcTextview == 1 && activeAwayYCs > 2) { // if we've printed one already
-                    awayYCText = "+" + Integer.toString(activeAwayYCs - 1);
+                if (awayYcTextView == 1 && activeAwayYCs > 2) { // if we've printed one already
+                    awayYCText = "+" + (activeAwayYCs - 1);
                     awayYc.setTextColor(Color.BLACK);
                     awayYc.setText(awayYCText);
                 }
 
-                if (awayYcTextview < 1 || activeAwayYCs == 2) { //always print item if first in list or 2 total
-                    awayYCText = awayYCs.get(i).player + " " + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime),
-                            TimeUnit.MILLISECONDS.toSeconds(awayYCs.get(i).currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(awayYCs.get(i).currentTime))) + "\n";
+                if (awayYcTextView < 1 || activeAwayYCs == 2) { //always print item if first in list or 2 total
+                    awayYCText = awayYCs.get(i).getText();
                     awayYc.setText(awayYCText);
-                    awayYcTextview++;
+                    awayYcTextView++;
                 }
 
             }
@@ -687,75 +791,118 @@ public class MainActivity extends WearableActivity {
         }
     }
 
+    public void checkDeviceHardware(){
+        PackageManager packageManager = this.getPackageManager();
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+
+        // Check whether the device has a speaker.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                // Check FEATURE_AUDIO_OUTPUT to guard against false positives.
+                packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)) {
+            AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+            for (AudioDeviceInfo device : devices) {
+                if (device.getType() == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                    deviceHasSpeaker = true;
+                }
+            }
+        }
+
+        deviceHasGps = packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
+
+        if (deviceHasGps) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+            }
+        }
+
+
+    }
+
 }
 
 class YellowCard {
+
     private Context context;
     public String player;
-    public Long currentTime;
+    public Long timeRemaining;
     public boolean acknowledged;
     public boolean expired;
-    private CountDownTimer ycTimer;
+    private boolean paused;
+    private boolean deviceHasSpeaker;
     private MediaPlayer mediaPlayer;
-    private long yellowCardLength;
 
-    public YellowCard (Context context, String player, long yellowCardLength){
+    public YellowCard (Context context, String player, long yellowCardLength, boolean deviceHasSpeaker){
         this.context = context;
         this.player = player;
-        this.yellowCardLength = yellowCardLength;
-        newYC();
-    }
-    private void newYC(){
-        this.createTimer(yellowCardLength);
+        this.timeRemaining = yellowCardLength;
+        this.deviceHasSpeaker = deviceHasSpeaker;
     }
 
-    private void createTimer(Long duration) {
-        ycTimer = new CountDownTimer(duration, 1000) { // adjust the milli seconds here
-            public void onTick(long millisUntilFinished) {
-                currentTime = millisUntilFinished;
-            }
+    public void decrementTimer(){
+        if (this.expired || this.paused){
+            return;
+        }
 
-            public void onFinish() {
-                mediaPlayer = MediaPlayer.create(context.getApplicationContext(), R.raw.alarm);
-                mediaPlayer.setVolume(1.0F, 1.0F);
-                mediaPlayer.start();
-                expired = true;
+        //update time remaining
+        this.timeRemaining = this.timeRemaining - 1000L;
 
-                // vibrate as well for watches that don't have speakers
+        if (this.timeRemaining == 0){
+            if (this.deviceHasSpeaker) {
+                this.mediaPlayer = MediaPlayer.create(context.getApplicationContext(), R.raw.alarm);
+                this.mediaPlayer.setVolume(1.0F, 1.0F);
+                this.mediaPlayer.start();
+            } else {
+                // vibrate for watches that don't have speakers
                 Vibrator vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
                 long[] vibrationPattern = {0, 1000, 500, 1000}; // {delay, vibrate, sleep, vibrate, sleep...
                 final int indexInPatternToRepeat = -1; //-1 - don't repeat
                 vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
-
             }
-        }.start();
+            this.expired = true;
+        }
+    }
+
+    public String getText() {
+        return this.player + " " + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(this.timeRemaining),
+                TimeUnit.MILLISECONDS.toSeconds(this.timeRemaining) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(this.timeRemaining))) + "\n";
     }
 
     public void pauseTimer() {
-        ycTimer.cancel();
+        this.paused = true;
     }
 
     public void acknowledge() {
         this.acknowledged = true;
-        this.mediaPlayer.stop();
+        if (this.deviceHasSpeaker) {
+            this.mediaPlayer.stop();
+        }
+
     }
 
     public void restartTimer() {
-        createTimer(currentTime);
+        this.paused = false;
     }
+
 }
+
 
 class Penalty implements Parcelable {
     public Long currentTime;
     public int period;
     public boolean yellowCard;
     public String side;
+    public double latitude;
+    public double longitude;
 
-    public Penalty (Long currentTime, int period, boolean yellowCard, String side){
+    public Penalty (Long currentTime, int period, boolean yellowCard, String side, Location location){
         this.currentTime = currentTime;
         this.period = period;
         this.yellowCard = yellowCard;
         this.side = side;
+        if (location != null){
+            this.latitude = location.getLatitude();
+            this.longitude = location.getLongitude();
+        }
     }
 
     @Override
@@ -770,6 +917,8 @@ class Penalty implements Parcelable {
         out.writeInt(period);
         out.writeByte((byte) (yellowCard ? 1 : 0));
         out.writeString(side);
+        out.writeDouble(latitude);
+        out.writeDouble(longitude);
     }
 
     private static Penalty readFromParcel(Parcel in) { // (4)
@@ -777,7 +926,10 @@ class Penalty implements Parcelable {
         int period = in.readInt();
         boolean yellowCard = in.readByte() != 0;
         String side = in.readString();
-        return new Penalty(currentTime, period, yellowCard, side);
+        Location location = new Location("");
+        location.setLatitude(in.readDouble());
+        location.setLongitude(in.readDouble());
+        return new Penalty(currentTime, period, yellowCard, side, location);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() // (5)

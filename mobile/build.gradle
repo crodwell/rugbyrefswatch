@@ -14,8 +14,8 @@ android {
         applicationId 'com.refrugby.watch'
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 10110
-        versionName "1.1.0"
+        versionCode 10111
+        versionName "1.1.1"
         signingConfig signingConfigs.signing_key
     }
     buildTypes {

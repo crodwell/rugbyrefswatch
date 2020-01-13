@@ -23,6 +23,7 @@ public class MainMenuActivity extends WearableActivity {
     private Integer currentPeriod;
     private Long currentMatchTime;
     private boolean u18;
+    private Float metersTravelled;
     public boolean countdownMatchClock;
 
     @Override
@@ -34,7 +35,9 @@ public class MainMenuActivity extends WearableActivity {
         currentPeriod = i.getIntExtra("currentPeriod", 0);
         currentMatchTime = i.getLongExtra("currentMatchTime", 0);
         u18 = i.getBooleanExtra("u18", false);
+        metersTravelled = i.getFloatExtra("metersTravelled", 0.0F);
         countdownMatchClock = i.getBooleanExtra("countdownMatchClock", false);
+
         WearableRecyclerView recyclerView = findViewById(R.id.main_menu_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setEdgeItemsCenteringEnabled(true);
@@ -141,19 +144,21 @@ public class MainMenuActivity extends WearableActivity {
             data.setVisibility(View.VISIBLE);
         }
 
+
+        TextView dtTextView = findViewById(getResources().getIdentifier("distance_travelled", "id", getPackageName()));
+        dtTextView.setText(String.format(java.util.Locale.UK, "%.2f km", metersTravelled/1000));
+
         ArrayList<Penalty> homePens = getIntent().getParcelableArrayListExtra("homePens");
         ArrayList<Penalty> awayPens = getIntent().getParcelableArrayListExtra("awayPens");
 
         for (Penalty item:homePens) {
             int resourceID = getResources().getIdentifier("home_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
-            Log.d("home", item.currentTime.toString());
             penTxt.setText(penTxt.getText().toString() + (item.yellowCard ? "YC " : "") + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
         for (Penalty item:awayPens) {
             int resourceID = getResources().getIdentifier("away_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
-            Log.d("away", item.currentTime.toString());
             penTxt.setText(penTxt.getText().toString() + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC" : "") +"\n");
         }
     }

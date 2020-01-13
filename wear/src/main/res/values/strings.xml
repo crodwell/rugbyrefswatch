@@ -12,6 +12,8 @@
     <string name="_quittingApp">Quitting</string>
     <string name="_cancel">Cancel</string>
     <string name="_matchSummary">Match Summary</string>
+    <string name="_distance">Distance:</string>
+    <string name="_notApplicable">N/A</string>
     <string name="_firstHalf">1st Half</string>
     <string name="_secondHalf">2nd Half</string>
     <string name="_extraTime1">Extra Time 1</string>
