@@ -7,6 +7,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,8 +45,12 @@ public class YellowCardActivity extends WearableActivity {
                         mCircularProgress.setOnTimerFinishedListener(new  CircularProgressLayout.OnTimerFinishedListener(){
                             @Override
                             public void onTimerFinished(CircularProgressLayout layout){
-                                setResult(RESULT_CANCELED);
-                                finish(); // TODO: maybe log a red card
+                                Intent i = new Intent();
+                                i.putExtra("player", player);
+                                i.putExtra("side", side);
+                                i.putExtra("redCard", true);
+                                setResult(RESULT_OK,i);
+                                finish();
                             }
                         });
                         mCircularProgress.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +67,13 @@ public class YellowCardActivity extends WearableActivity {
                 }
 
                 setContentView(R.layout.confirm_yc);
+                Button redCardButton = findViewById(R.id.red_card_button);
+                redCardButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        redCard(player, side);
+                    }
+                });
+
                 TextView txt = findViewById(R.id.confirmMsg);
                 txt.setText("Yellow Card\nStarting For\n" + player);
                 CircularProgressLayout mCircularProgress = findViewById(R.id.circular_progress);
@@ -71,7 +83,7 @@ public class YellowCardActivity extends WearableActivity {
                         Intent i = new Intent();
                         i.putExtra("player", player);
                         i.putExtra("side", side);
-
+                        i.putExtra("yellowCard", true);
                         setResult(RESULT_OK,i);
                         finish();
                     }
@@ -90,4 +102,33 @@ public class YellowCardActivity extends WearableActivity {
 
     }
 
+    public void redCard(final String player, final String side) {
+        setContentView(R.layout.confirm_rc);
+        TextView txt = findViewById(R.id.confirmMsg);
+        txt.setText("Red Card For\n" + player);
+        CircularProgressLayout mCircularProgress = findViewById(R.id.circular_progress);
+        mCircularProgress.setOnTimerFinishedListener(new  CircularProgressLayout.OnTimerFinishedListener(){
+            @Override
+            public void onTimerFinished(CircularProgressLayout layout){
+                Intent i = new Intent();
+                i.putExtra("player", player);
+                i.putExtra("side", side);
+                i.putExtra("redCard", true);
+                setResult(RESULT_OK,i);
+                finish();
+            }
+        });
+        mCircularProgress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
+        mCircularProgress.setTotalTime(5000);
+        mCircularProgress.startTimer();
+        return;
+    }
+
 }
+

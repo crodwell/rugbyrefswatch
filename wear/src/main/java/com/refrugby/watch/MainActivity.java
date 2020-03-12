@@ -92,7 +92,7 @@ public class MainActivity extends WearableActivity {
     private Integer awayColourCode = 3;
 
     //Activity Request Code Constants
-    static final int YELLOW_CARD = 100;
+    static final int CARD = 100;
     static final int MAIN_MENU = 200;
 
     private static final Map<String, String> teamBgColours;
@@ -253,7 +253,7 @@ public class MainActivity extends WearableActivity {
             }
         }
 
-        homePens.add(new Penalty(currentMatchTime, currentPeriod, false, "home", lastKnownLocation));
+        homePens.add(new Penalty(currentMatchTime, currentPeriod, false, false,"home", "", lastKnownLocation));
         ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
         drawPenaltyHistory();
     }
@@ -277,7 +277,7 @@ public class MainActivity extends WearableActivity {
                 return;
             }
         }
-        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false, "away", lastKnownLocation));
+        awayPens.add(new Penalty(currentMatchTime, currentPeriod, false, false,"away", "", lastKnownLocation));
         ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
         drawPenaltyHistory();
     }
@@ -368,7 +368,7 @@ public class MainActivity extends WearableActivity {
             history.add(item.player);
         }
         yellowCard.putExtra("history", history);
-        startActivityForResult(yellowCard, YELLOW_CARD);
+        startActivityForResult(yellowCard, CARD);
     }
 
     public void awayYC(View v){
@@ -394,7 +394,7 @@ public class MainActivity extends WearableActivity {
             history.add(item.player);
         }
         yellowCard.putExtra("history", history);
-        startActivityForResult(yellowCard, YELLOW_CARD);
+        startActivityForResult(yellowCard, CARD);
     }
 
     public void menu(View v){
@@ -426,26 +426,33 @@ public class MainActivity extends WearableActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == YELLOW_CARD) {
+        if (requestCode == CARD) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // The user picked a player.
                 String player = data.getExtras().get("player").toString();
                 String side = data.getExtras().get("side").toString();
+                boolean redCard = data.getBooleanExtra("redCard", false);
+                boolean yellowCard = data.getBooleanExtra("yellowCard", false);
 
                 if (side.equals("home")){
-                    homeYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
-                    activeHomeYCs++;
-                    homePens.add(new Penalty(currentMatchTime, currentPeriod, true, "home", lastKnownLocation));
+                    if (yellowCard) {
+                        homeYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
+                        activeHomeYCs++;
+                    }
+                    homePens.add(new Penalty(currentMatchTime, currentPeriod, yellowCard, redCard, "home", player, lastKnownLocation));
                     ((TextView)findViewById(R.id.home_pen)).setText(Integer.toString(homePens.size()));
                 } else {
-                    awayYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
-                    activeAwayYCs++;
-                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, true, "away", lastKnownLocation));
+                    if (yellowCard) {
+                        awayYCs.add(new YellowCard(this, player, yellowCardLength, deviceHasSpeaker));
+                        activeAwayYCs++;
+                    }
+                    awayPens.add(new Penalty(currentMatchTime, currentPeriod, yellowCard, redCard, "away", player, lastKnownLocation));
                     ((TextView)findViewById(R.id.away_pen)).setText(Integer.toString(awayPens.size()));
                 }
                 drawPenaltyHistory();
             }
+
         }
 
         if (requestCode == MAIN_MENU){
@@ -890,15 +897,19 @@ class Penalty implements Parcelable {
     public Long currentTime;
     public int period;
     public boolean yellowCard;
+    public boolean redCard;
     public String side;
+    public String player;
     public double latitude;
     public double longitude;
 
-    public Penalty (Long currentTime, int period, boolean yellowCard, String side, Location location){
+    public Penalty (Long currentTime, int period, boolean yellowCard, boolean redCard, String side, String player, Location location){
         this.currentTime = currentTime;
         this.period = period;
         this.yellowCard = yellowCard;
+        this.redCard = redCard;
         this.side = side;
+        this.player = player;
         if (location != null){
             this.latitude = location.getLatitude();
             this.longitude = location.getLongitude();
@@ -916,7 +927,9 @@ class Penalty implements Parcelable {
         out.writeLong(currentTime);
         out.writeInt(period);
         out.writeByte((byte) (yellowCard ? 1 : 0));
+        out.writeByte((byte) (redCard ? 1 : 0));
         out.writeString(side);
+        out.writeString(player);
         out.writeDouble(latitude);
         out.writeDouble(longitude);
     }
@@ -925,11 +938,13 @@ class Penalty implements Parcelable {
         Long currentTime = in.readLong();
         int period = in.readInt();
         boolean yellowCard = in.readByte() != 0;
+        boolean redCard = in.readByte() != 0;
         String side = in.readString();
+        String player = in.readString();
         Location location = new Location("");
         location.setLatitude(in.readDouble());
         location.setLongitude(in.readDouble());
-        return new Penalty(currentTime, period, yellowCard, side, location);
+        return new Penalty(currentTime, period, yellowCard, redCard, side, player, location);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() // (5)

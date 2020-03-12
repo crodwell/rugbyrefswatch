@@ -154,12 +154,12 @@ public class MainMenuActivity extends WearableActivity {
         for (Penalty item:homePens) {
             int resourceID = getResources().getIdentifier("home_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
-            penTxt.setText(penTxt.getText().toString() + (item.yellowCard ? "YC " : "") + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
+            penTxt.setText(penTxt.getText().toString() + item.player + (item.redCard ? " RC " : "") + (item.yellowCard ? " YC " : "") + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + "\n");
         }
         for (Penalty item:awayPens) {
             int resourceID = getResources().getIdentifier("away_pen_" + item.period, "id", getPackageName());
             TextView penTxt = findViewById(resourceID);
-            penTxt.setText(penTxt.getText().toString() + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC" : "") +"\n");
+            penTxt.setText(penTxt.getText().toString() + String.format(Locale.getDefault(), "%d:%02d", TimeUnit.MILLISECONDS.toMinutes(item.currentTime), TimeUnit.MILLISECONDS.toSeconds(item.currentTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(item.currentTime))) + (item.yellowCard ? " YC " : "") +  (item.redCard ? " RC " : "") + item.player +"\n");
         }
     }
 
